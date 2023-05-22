@@ -8,7 +8,9 @@
         #:util.string
         #:pycl.sys)
   (:export
-   ;; configuration
+   ;; init
+   #:*pycontext*
+   #:*libpython-loaded-p*
    #:pycontext
    #:pycontext-p
    #:pycontext-lib
@@ -20,7 +22,6 @@
    #:pycontext-finalized-p
    #:init-pycontext
    #:finalize-pycontext
-   #:*pycontext*
    ;; pyobject
    ;; #:pyobject #:to-pyobject #:from-pyobject #:pyobject-eq #:pynull-p
    ;; #:pyincref #:pydecref #:pytypep #:pytype-of
