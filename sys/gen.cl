@@ -25,8 +25,8 @@
               (t x)))
     (list (case (first x)
             (:pointer (case (second x)
-                        (PyObject `((* .PyObject.) ; foreign type
-                                    PyObject       ; lisp type
+                        (PyObject `((* PyObject) ; foreign type
+                                    pyptr        ; lisp type
                                     ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
                         (size_t '((* :unsigned-nat)))
                         (t :foreign-address)))

@@ -52,15 +52,15 @@
 
 (foreign-functions:def-foreign-call PyType_FromSpec
   ((#:arg4239 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyType_FromSpecWithBases
   ((#:arg4252 :foreign-address)
-   (#:arg4257 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg4257 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyType_GetSlot
   ((#:arg4270 :foreign-address) (#:arg4275 :int)) :strings-convert nil
@@ -83,16 +83,16 @@
 (foreign-functions:def-foreign-call PyType_GenericAlloc
   ((#:arg4324 :foreign-address) (#:arg4329 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyType_GenericNew
   ((#:arg4340 :foreign-address)
-   (#:arg4345 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4350 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg4345 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4350 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyType_ClearCache (:void)
   :strings-convert nil :returning :unsigned-int :allow-gc :always
@@ -103,164 +103,164 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Repr
-  ((#:arg4380 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4380 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Str
-  ((#:arg4393 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4393 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_ASCII
-  ((#:arg4406 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4406 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Bytes
-  ((#:arg4419 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4419 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_RichCompare
-  ((#:arg4432 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4437 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4432 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4437 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4442 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_RichCompareBool
-  ((#:arg4453 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4458 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4453 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4458 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4463 :int))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GetAttrString
-  ((#:arg4472 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4472 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4477 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_SetAttrString
-  ((#:arg4490 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4490 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4495 :foreign-address)
-   (#:arg4500 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg4500 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_HasAttrString
-  ((#:arg4511 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4511 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4516 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GetAttr
-  ((#:arg4527 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4532 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4527 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4532 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_SetAttr
-  ((#:arg4545 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4550 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4555 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4545 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4550 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4555 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_HasAttr
-  ((#:arg4566 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4571 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4566 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4571 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_SelfIter
-  ((#:arg4582 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4582 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GenericGetAttr
-  ((#:arg4595 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4600 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4595 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4600 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GenericSetAttr
-  ((#:arg4613 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4618 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4623 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4613 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4618 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4623 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GenericSetDict
-  ((#:arg4634 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4639 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4634 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4639 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4644 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Hash
-  ((#:arg4655 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4655 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_hash_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_HashNotImplemented
-  ((#:arg4666 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4666 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_hash_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_IsTrue
-  ((#:arg4677 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4677 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Not
-  ((#:arg4688 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4688 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCallable_Check
-  ((#:arg4699 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4699 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_ClearWeakRefs
-  ((#:arg4710 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4710 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Dir
-  ((#:arg4721 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4721 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call Py_ReprEnter
-  ((#:arg4734 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4734 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call Py_ReprLeave
-  ((#:arg4745 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4745 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call Py_IncRef
-  ((#:arg4772 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4772 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call Py_DecRef
-  ((#:arg4783 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4783 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -283,11 +283,11 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Init
-  ((#:arg4844 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg4844 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg4849 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_InitVar
   ((#:arg4862 :foreign-address) (#:arg4867 :foreign-address)
@@ -312,36 +312,36 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_FromObject
-  ((#:arg4936 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4936 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_Concat
-  ((#:arg4949 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg4954 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4949 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg4954 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_FromStringAndSize
   ((#:arg4967 :foreign-address) (#:arg4972 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_Size
-  ((#:arg4983 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4983 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_AsString
-  ((#:arg4994 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg4994 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyByteArray_Resize
-  ((#:arg5007 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg5007 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg5012 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
@@ -349,46 +349,46 @@
 (foreign-functions:def-foreign-call PyBytes_FromStringAndSize
   ((#:arg5021 :foreign-address) (#:arg5026 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_FromString
   ((#:arg5037 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_FromObject
-  ((#:arg5050 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg5050 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_Size
-  ((#:arg5067 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg5067 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_AsString
-  ((#:arg5078 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg5078 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_Repr
-  ((#:arg5091 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg5091 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg5096 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_Concat
   ((#:arg5107 :foreign-address)
-   (#:arg5112 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg5112 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_ConcatAndDel
   ((#:arg5123 :foreign-address)
-   (#:arg5128 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg5128 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -397,61 +397,61 @@
    (#:arg5147 :foreign-address) (#:arg5152 Py_ssize_t)
    (#:arg5155 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyBytes_AsStringAndSize
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
    (s :foreign-address) (len :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromStringAndSize
   ((u :foreign-address) (size Py_ssize_t)) :strings-convert nil
-  :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
-  :allow-gc :always :call-direct t :arg-checking nil)
+  :returning ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc
+  :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromString
   ((u :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Substring
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
    (start Py_ssize_t) (end Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUCS4
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (buffer :foreign-address) (buflen Py_ssize_t) (copy_null :int))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUCS4Copy
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_GetLength
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_GetSize
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_ReadChar
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (index Py_ssize_t))
   :strings-convert nil :returning Py_UCS4 :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_WriteChar
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (index Py_ssize_t) (character Py_UCS4))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
@@ -461,17 +461,17 @@
   :returning :int :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromEncodedObject
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromObject
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_InternInPlace
   ((#:arg5650 :foreign-address)) :strings-convert nil :returning :void
@@ -483,30 +483,30 @@
 
 (foreign-functions:def-foreign-call PyUnicode_InternFromString
   ((u :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromWideChar
   ((w :foreign-address) (size Py_ssize_t)) :strings-convert nil
-  :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
-  :allow-gc :always :call-direct t :arg-checking nil)
+  :returning ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc
+  :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsWideChar
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (w :foreign-address) (size Py_ssize_t))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsWideCharString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (size :foreign-address))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FromOrdinal
   ((ordinal :int)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_ClearFreeList (:void)
   :strings-convert nil :returning :int :allow-gc :always :call-direct
@@ -520,487 +520,485 @@
   ((s :foreign-address) (size Py_ssize_t) (encoding :foreign-address)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsDecodedObject
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsDecodedUnicode
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsEncodedObject
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsEncodedString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsEncodedUnicode
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_BuildEncodingMap
-  ((string (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((string (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF7
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF7Stateful
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (consumed :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF8
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF8Stateful
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (consumed :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUTF8String
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF32
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (byteorder :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF32Stateful
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (byteorder :foreign-address)
    (consumed :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUTF32String
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF16
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (byteorder :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUTF16Stateful
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address) (byteorder :foreign-address)
    (consumed :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUTF16String
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeUnicodeEscape
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsUnicodeEscapeString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeRawUnicodeEscape
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsRawUnicodeEscapeString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeLatin1
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsLatin1String
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeASCII
   ((string :foreign-address) (length Py_ssize_t)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsASCIIString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeCharmap
   ((string :foreign-address) (length Py_ssize_t)
-   (mapping (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (mapping (* PyObject) pyptr convert-python-ff-call/arg)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AsCharmapString
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (mapping (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
+   (mapping (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeLocaleAndSize
   ((str :foreign-address) (len Py_ssize_t) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeLocale
   ((str :foreign-address) (errors :foreign-address)) :strings-convert
-  nil :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_EncodeLocale
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FSConverter
-  ((#:arg6308 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg6308 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg6313 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FSDecoder
-  ((#:arg6324 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg6324 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg6329 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeFSDefault
   ((s :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_DecodeFSDefaultAndSize
   ((s :foreign-address) (size Py_ssize_t)) :strings-convert nil
-  :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
-  :allow-gc :always :call-direct t :arg-checking nil)
+  :returning ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc
+  :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_EncodeFSDefault
-  ((unicode (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((unicode (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Concat
-  ((left (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (right (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((left (* PyObject) pyptr convert-python-ff-call/arg)
+   (right (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Append
   ((pleft :foreign-address)
-   (right (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (right (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_AppendAndDel
   ((pleft :foreign-address)
-   (right (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (right (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Split
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (sep (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((s (* PyObject) pyptr convert-python-ff-call/arg)
+   (sep (* PyObject) pyptr convert-python-ff-call/arg)
    (maxsplit Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Splitlines
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (keepends :int))
+  ((s (* PyObject) pyptr convert-python-ff-call/arg) (keepends :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Partition
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (sep (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((s (* PyObject) pyptr convert-python-ff-call/arg)
+   (sep (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_RPartition
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (sep (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((s (* PyObject) pyptr convert-python-ff-call/arg)
+   (sep (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_RSplit
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (sep (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((s (* PyObject) pyptr convert-python-ff-call/arg)
+   (sep (* PyObject) pyptr convert-python-ff-call/arg)
    (maxsplit Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Translate
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (table (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
+   (table (* PyObject) pyptr convert-python-ff-call/arg)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Join
-  ((separator (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (seq (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((separator (* PyObject) pyptr convert-python-ff-call/arg)
+   (seq (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Tailmatch
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (substr (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
+   (substr (* PyObject) pyptr convert-python-ff-call/arg)
    (start Py_ssize_t) (end Py_ssize_t) (direction :int))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Find
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (substr (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
+   (substr (* PyObject) pyptr convert-python-ff-call/arg)
    (start Py_ssize_t) (end Py_ssize_t) (direction :int))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_FindChar
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (ch Py_UCS4) (start Py_ssize_t) (end Py_ssize_t) (direction :int))
+  ((str (* PyObject) pyptr convert-python-ff-call/arg) (ch Py_UCS4)
+   (start Py_ssize_t) (end Py_ssize_t) (direction :int))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Count
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (substr (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
+   (substr (* PyObject) pyptr convert-python-ff-call/arg)
    (start Py_ssize_t) (end Py_ssize_t))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Replace
-  ((str (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (substr (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (replstr (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((str (* PyObject) pyptr convert-python-ff-call/arg)
+   (substr (* PyObject) pyptr convert-python-ff-call/arg)
+   (replstr (* PyObject) pyptr convert-python-ff-call/arg)
    (maxcount Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Compare
-  ((left (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (right (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((left (* PyObject) pyptr convert-python-ff-call/arg)
+   (right (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_CompareWithASCIIString
-  ((left (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((left (* PyObject) pyptr convert-python-ff-call/arg)
    (right :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_RichCompare
-  ((left (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (right (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (op :int))
+  ((left (* PyObject) pyptr convert-python-ff-call/arg)
+   (right (* PyObject) pyptr convert-python-ff-call/arg) (op :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Format
-  ((format (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (args (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((format (* PyObject) pyptr convert-python-ff-call/arg)
+   (args (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_Contains
-  ((container (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (element (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((container (* PyObject) pyptr convert-python-ff-call/arg)
+   (element (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicode_IsIdentifier
-  ((s (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :int :allow-gc :always :call-direct t
-  :arg-checking nil)
+  ((s (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :int :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyLong_FromLong ((#:arg6724 :long))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromUnsignedLong
   ((#:arg6735 :unsigned-long)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromSize_t
   ((#:arg6746 :unsigned-nat)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromSsize_t
   ((#:arg6757 Py_ssize_t)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromDouble
   ((#:arg6768 :double)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsLong
-  ((#:arg6779 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6779 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :long :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsLongAndOverflow
-  ((#:arg6790 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg6790 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg6795 :foreign-address))
   :strings-convert nil :returning :long :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsSsize_t
-  ((#:arg6806 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6806 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsSize_t
-  ((#:arg6817 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6817 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :unsigned-nat :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsUnsignedLong
-  ((#:arg6828 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6828 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :unsigned-long :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsUnsignedLongMask
-  ((#:arg6839 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6839 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :unsigned-long :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_GetInfo (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsDouble
-  ((#:arg6858 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6858 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :double :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromVoidPtr
   ((#:arg6869 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsVoidPtr
-  ((#:arg6882 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6882 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromLongLong
   ((#:arg6895 :long-long)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_FromUnsignedLongLong
   ((#:arg6906 :unsigned-long-long)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsLongLong
-  ((#:arg6917 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6917 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :long-long :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsUnsignedLongLong
-  ((#:arg6928 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6928 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :unsigned-long-long :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsUnsignedLongLongMask
-  ((#:arg6939 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg6939 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :unsigned-long-long :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyLong_AsLongLongAndOverflow
-  ((#:arg6950 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg6950 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg6955 :foreign-address))
   :strings-convert nil :returning :long-long :allow-gc :always
   :call-direct t :arg-checking nil)
@@ -1009,8 +1007,8 @@
   ((#:arg6966 :foreign-address) (#:arg6971 :foreign-address)
    (#:arg6976 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyOS_strtoul
   ((#:arg6987 :foreign-address) (#:arg6992 :foreign-address)
@@ -1026,8 +1024,8 @@
 
 (foreign-functions:def-foreign-call PyBool_FromLong ((#:arg7025 :long))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFloat_GetMax (:void)
   :strings-convert nil :returning :double :allow-gc :always
@@ -1039,89 +1037,89 @@
 
 (foreign-functions:def-foreign-call PyFloat_GetInfo (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFloat_FromString
-  ((#:arg7056 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7056 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFloat_FromDouble
   ((#:arg7069 :double)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFloat_AsDouble
-  ((#:arg7080 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7080 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :double :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyComplex_FromDoubles
   ((real :double) (imag :double)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyComplex_RealAsDouble
-  ((op (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :double :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((op (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :double :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyComplex_ImagAsDouble
-  ((op (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :double :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((op (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :double :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyMemoryView_FromObject
-  ((base (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((base (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMemoryView_FromMemory
   ((mem :foreign-address) (size Py_ssize_t) (flags :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMemoryView_GetContiguous
-  ((base (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((base (* PyObject) pyptr convert-python-ff-call/arg)
    (buffertype :int) (order :char fixnum))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_New ((size Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_Size
-  ((#:arg7177 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7177 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_GetItem
-  ((#:arg7188 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7188 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7193 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_SetItem
-  ((#:arg7204 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7204 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7209 Py_ssize_t)
-   (#:arg7212 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg7212 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_GetSlice
-  ((#:arg7223 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7223 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7228 Py_ssize_t) (#:arg7231 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTuple_ClearFreeList (:void)
   :strings-convert nil :returning :int :allow-gc :always :call-direct
@@ -1129,324 +1127,320 @@
 
 (foreign-functions:def-foreign-call PyList_New ((size Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_Size
-  ((#:arg7260 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7260 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_GetItem
-  ((#:arg7271 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7271 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7276 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_SetItem
-  ((#:arg7287 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7287 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7292 Py_ssize_t)
-   (#:arg7295 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg7295 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_Insert
-  ((#:arg7306 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7306 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7311 Py_ssize_t)
-   (#:arg7314 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg7314 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_Append
-  ((#:arg7325 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg7330 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7325 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg7330 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_GetSlice
-  ((#:arg7341 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7341 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7346 Py_ssize_t) (#:arg7349 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_SetSlice
-  ((#:arg7360 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg7360 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg7365 Py_ssize_t) (#:arg7368 Py_ssize_t)
-   (#:arg7371 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg7371 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_Sort
-  ((#:arg7382 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7382 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_Reverse
-  ((#:arg7393 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7393 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyList_AsTuple
-  ((#:arg7404 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7404 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_New (:void) :strings-convert
-  nil :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
   :allow-gc :always :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_GetItem
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_GetItemWithError
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_SetItem
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (item (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg)
+   (item (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_DelItem
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Clear
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :void :allow-gc :always :call-direct
-  t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :void :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyDict_Next
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
    (pos :foreign-address) (key :foreign-address)
    (value :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Keys
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Values
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Items
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Size
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Copy
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Contains
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Update
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (other (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (other (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_Merge
-  ((mp (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (other (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((mp (* PyObject) pyptr convert-python-ff-call/arg)
+   (other (* PyObject) pyptr convert-python-ff-call/arg)
    (override :int))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_MergeFromSeq2
-  ((d (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (seq2 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((d (* PyObject) pyptr convert-python-ff-call/arg)
+   (seq2 (* PyObject) pyptr convert-python-ff-call/arg)
    (override :int))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_GetItemString
-  ((dp (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((dp (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_SetItemString
-  ((dp (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((dp (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address)
-   (item (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (item (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDict_DelItemString
-  ((dp (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((dp (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_New
-  ((#:arg7687 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7687 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFrozenSet_New
-  ((#:arg7700 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7700 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Add
-  ((set (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((set (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Clear
-  ((set (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((set (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Contains
-  ((anyset (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((anyset (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Discard
-  ((set (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((set (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Pop
-  ((set (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((set (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySet_Size
-  ((anyset (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((anyset (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_GetFunction
-  ((#:arg7787 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7787 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning PyCFunction :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_GetSelf
-  ((#:arg7798 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7798 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_GetFlags
-  ((#:arg7811 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7811 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_Call
-  ((#:arg7822 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg7827 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg7832 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7822 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg7827 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg7832 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_NewEx
   ((#:arg7845 :foreign-address)
-   (#:arg7850 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg7855 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg7850 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg7855 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCFunction_ClearFreeList (:void)
   :strings-convert nil :returning :int :allow-gc :always :call-direct
   nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_NewObject
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((name (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_New
   ((name :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetDict
-  ((#:arg7898 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7898 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetNameObject
-  ((#:arg7911 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7911 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetName
-  ((#:arg7924 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7924 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetFilename
-  ((#:arg7937 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7937 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetFilenameObject
-  ((#:arg7950 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7950 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetDef
-  ((#:arg7963 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7963 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_GetState
-  ((#:arg7976 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg7976 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModuleDef_Init
   ((#:arg7989 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFile_FromFd
   ((#:arg8002 :int) (#:arg8005 :foreign-address)
@@ -1454,31 +1448,31 @@
    (#:arg8018 :foreign-address) (#:arg8023 :foreign-address)
    (#:arg8028 :foreign-address) (#:arg8033 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFile_GetLine
-  ((#:arg8044 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg8044 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg8049 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFile_WriteObject
-  ((#:arg8060 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8065 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg8060 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8065 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg8070 :int))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyFile_WriteString
   ((#:arg8079 :foreign-address)
-   (#:arg8084 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg8084 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_AsFileDescriptor
-  ((#:arg8095 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8095 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -1486,56 +1480,56 @@
   ((pointer :foreign-address) (name :foreign-address)
    (destructor PyCapsule_Destructor))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_GetPointer
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (name :foreign-address))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_GetDestructor
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning PyCapsule_Destructor :allow-gc
   :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_GetName
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_GetContext
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_IsValid
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (name :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_SetPointer
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (pointer :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_SetDestructor
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (destructor PyCapsule_Destructor))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_SetName
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (name :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCapsule_SetContext
-  ((capsule (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((capsule (* PyObject) pyptr convert-python-ff-call/arg)
    (context :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
@@ -1550,116 +1544,116 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyTraceBack_Print
-  ((#:arg8267 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8272 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8267 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8272 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySlice_New
-  ((start (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (stop (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (step (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((start (* PyObject) pyptr convert-python-ff-call/arg)
+   (stop (* PyObject) pyptr convert-python-ff-call/arg)
+   (step (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySlice_GetIndices
-  ((r (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((r (* PyObject) pyptr convert-python-ff-call/arg)
    (length Py_ssize_t) (start :foreign-address) (stop :foreign-address)
    (step :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySlice_GetIndicesEx
-  ((r (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((r (* PyObject) pyptr convert-python-ff-call/arg)
    (length Py_ssize_t) (start :foreign-address) (stop :foreign-address)
    (step :foreign-address) (slicelength :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySeqIter_New
-  ((#:arg8355 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8355 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCallIter_New
-  ((#:arg8368 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8373 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8368 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8373 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDescr_NewMethod
   ((#:arg8386 :foreign-address) (#:arg8391 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDescr_NewClassMethod
   ((#:arg8404 :foreign-address) (#:arg8409 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDescr_NewMember
   ((#:arg8422 :foreign-address) (#:arg8427 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDescr_NewGetSet
   ((#:arg8440 :foreign-address) (#:arg8445 :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyDictProxy_New
-  ((#:arg8458 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8458 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyWrapper_New
-  ((#:arg8471 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8476 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8471 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8476 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_WarnEx
-  ((category (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((category (* PyObject) pyptr convert-python-ff-call/arg)
    (message :foreign-address) (stack_level Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_WarnExplicit
-  ((category (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((category (* PyObject) pyptr convert-python-ff-call/arg)
    (message :foreign-address) (filename :foreign-address) (lineno :int)
    (module :foreign-address)
-   (registry (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (registry (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyWeakref_NewRef
-  ((ob (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (callback (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((ob (* PyObject) pyptr convert-python-ff-call/arg)
+   (callback (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyWeakref_NewProxy
-  ((ob (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (callback (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((ob (* PyObject) pyptr convert-python-ff-call/arg)
+   (callback (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyWeakref_GetObject
-  ((ref (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((ref (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyStructSequence_NewType
   ((desc :foreign-address)) :strings-convert nil :returning
@@ -1667,26 +1661,25 @@
 
 (foreign-functions:def-foreign-call PyStructSequence_New
   ((type :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyStructSequence_SetItem
-  ((#:arg8605 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg8605 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg8610 Py_ssize_t)
-   (#:arg8613 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg8613 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyStructSequence_GetItem
-  ((#:arg8624 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg8624 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg8629 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_Register
-  ((search_function (* .PyObject.) PyObject
-    convert-python-ff-call/arg))
+  ((search_function (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -1695,125 +1688,125 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_Encode
-  ((object (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((object (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_Decode
-  ((object (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((object (* PyObject) pyptr convert-python-ff-call/arg)
    (encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_Encoder
   ((encoding :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_Decoder
   ((encoding :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_IncrementalEncoder
   ((encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_IncrementalDecoder
   ((encoding :foreign-address) (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_StreamReader
   ((encoding :foreign-address)
-   (stream (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (stream (* PyObject) pyptr convert-python-ff-call/arg)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_StreamWriter
   ((encoding :foreign-address)
-   (stream (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (stream (* PyObject) pyptr convert-python-ff-call/arg)
    (errors :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_RegisterError
   ((name :foreign-address)
-   (error (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (error (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_LookupError
   ((name :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_StrictErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_IgnoreErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_ReplaceErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_XMLCharRefReplaceErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_BackslashReplaceErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyCodec_NameReplaceErrors
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetNone
-  ((#:arg8894 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8894 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetObject
-  ((#:arg8905 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8910 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8905 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8910 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetString
-  ((exception (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((exception (* PyObject) pyptr convert-python-ff-call/arg)
    (string :foreign-address))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_Occurred (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_Clear (:void)
   :strings-convert nil :returning :void :allow-gc :always :call-direct
@@ -1826,9 +1819,9 @@
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_Restore
-  ((#:arg8970 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8975 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg8980 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg8970 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8975 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg8980 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -1839,9 +1832,9 @@
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetExcInfo
-  ((#:arg9012 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9017 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9022 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9012 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9017 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9022 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -1850,13 +1843,13 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_GivenExceptionMatches
-  ((#:arg9043 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9048 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9043 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9048 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_ExceptionMatches
-  ((#:arg9059 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9059 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -1867,43 +1860,43 @@
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_SetTraceback
-  ((#:arg9091 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9096 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9091 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9096 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_GetTraceback
-  ((#:arg9107 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9107 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_GetCause
-  ((#:arg9120 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9120 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_SetCause
-  ((#:arg9133 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9138 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9133 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9138 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_GetContext
-  ((#:arg9149 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9149 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyException_SetContext
-  ((#:arg9162 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9167 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9162 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9167 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyExceptionClass_Name
-  ((#:arg9178 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9178 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
@@ -1913,55 +1906,55 @@
 
 (foreign-functions:def-foreign-call PyErr_NoMemory (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetFromErrno
-  ((#:arg9205 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9205 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call
   PyErr_SetFromErrnoWithFilenameObject
-  ((#:arg9218 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9223 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9218 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9223 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call
   PyErr_SetFromErrnoWithFilenameObjects
-  ((#:arg9236 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9241 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9246 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9236 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9241 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9246 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetFromErrnoWithFilename
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg)
    (filename :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetImportErrorSubclass
-  ((#:arg9279 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9284 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9289 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9294 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9279 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9284 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9289 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9294 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_SetImportError
-  ((#:arg9307 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9312 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg9317 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9307 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9312 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg9317 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_BadInternalCall (:void)
   :strings-convert nil :returning :void :allow-gc :always :call-direct
@@ -1969,22 +1962,22 @@
 
 (foreign-functions:def-foreign-call PyErr_NewException
   ((name :foreign-address)
-   (base (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (dict (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (base (* PyObject) pyptr convert-python-ff-call/arg)
+   (dict (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_NewExceptionWithDoc
   ((name :foreign-address) (doc :foreign-address)
-   (base (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (dict (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (base (* PyObject) pyptr convert-python-ff-call/arg)
+   (dict (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_WriteUnraisable
-  ((#:arg9382 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9382 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -2007,151 +2000,151 @@
 
 (foreign-functions:def-foreign-call PyErr_ProgramText
   ((filename :foreign-address) (lineno :int)) :strings-convert nil
-  :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
-  :allow-gc :always :call-direct t :arg-checking nil)
+  :returning ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc
+  :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_Create
   ((encoding :foreign-address) (object :foreign-address)
    (length Py_ssize_t) (start Py_ssize_t) (end Py_ssize_t)
    (reason :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_GetEncoding
-  ((#:arg9471 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9471 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_GetEncoding
-  ((#:arg9484 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9484 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_GetObject
-  ((#:arg9497 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9497 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_GetObject
-  ((#:arg9510 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9510 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_GetObject
-  ((#:arg9523 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9523 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_GetStart
-  ((#:arg9536 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9536 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9541 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_GetStart
-  ((#:arg9552 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9552 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9557 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_GetStart
-  ((#:arg9568 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9568 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9573 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_SetStart
-  ((#:arg9584 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9584 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9589 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_SetStart
-  ((#:arg9598 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9598 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9603 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_SetStart
-  ((#:arg9612 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9612 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9617 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_GetEnd
-  ((#:arg9626 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9626 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9631 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_GetEnd
-  ((#:arg9642 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9642 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9647 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_GetEnd
-  ((#:arg9658 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9658 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9663 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_SetEnd
-  ((#:arg9674 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9674 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9679 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_SetEnd
-  ((#:arg9688 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9688 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9693 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_SetEnd
-  ((#:arg9702 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9702 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9707 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_GetReason
-  ((#:arg9716 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9716 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_GetReason
-  ((#:arg9729 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9729 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_GetReason
-  ((#:arg9742 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg9742 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeEncodeError_SetReason
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg)
    (reason :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeDecodeError_SetReason
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg)
    (reason :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyUnicodeTranslateError_SetReason
-  ((exc (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((exc (* PyObject) pyptr convert-python-ff-call/arg)
    (reason :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
@@ -2210,8 +2203,8 @@
 
 (foreign-functions:def-foreign-call PyThread_GetInfo (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyThread_create_key (:void)
   :strings-convert nil :returning :int :allow-gc :always :call-direct
@@ -2250,7 +2243,7 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyState_AddModule
-  ((#:arg9991 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg9991 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg9996 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
@@ -2261,8 +2254,8 @@
 
 (foreign-functions:def-foreign-call PyState_FindModule
   ((#:arg10018 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyThreadState_New
   ((#:arg10031 :foreign-address)) :strings-convert nil :returning
@@ -2290,12 +2283,12 @@
 
 (foreign-functions:def-foreign-call PyThreadState_GetDict (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyThreadState_SetAsyncExc
   ((#:arg10101 :unsigned-long)
-   (#:arg10104 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg10104 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -2312,59 +2305,59 @@
   :always :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyArg_ValidateKeywordArguments
-  ((#:arg10148 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg10148 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_AddObject
-  ((#:arg10167 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg10167 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg10172 :foreign-address)
-   (#:arg10177 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg10177 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_AddIntConstant
-  ((#:arg10188 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg10188 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg10193 :foreign-address) (#:arg10198 :long))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_AddStringConstant
-  ((#:arg10207 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg10207 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg10212 :foreign-address) (#:arg10217 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_SetDocString
-  ((#:arg10228 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg10228 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg10233 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_AddFunctions
-  ((#:arg10244 (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((#:arg10244 (* PyObject) pyptr convert-python-ff-call/arg)
    (#:arg10249 :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_ExecDef
-  ((module (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((module (* PyObject) pyptr convert-python-ff-call/arg)
    (def :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_Create2
   ((#:arg10274 :foreign-address) (apiver :int)) :strings-convert nil
-  :returning ((* .PyObject.) PyObject convert-python-ff-call/ret)
-  :allow-gc :always :call-direct t :arg-checking nil)
+  :returning ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc
+  :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyModule_FromDefAndSpec2
   ((def :foreign-address)
-   (spec (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (spec (* PyObject) pyptr convert-python-ff-call/arg)
    (module_api_version :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyParser_SimpleParseStringFlags
   ((#:arg10307 :foreign-address) (#:arg10312 :int) (#:arg10315 :int))
@@ -2388,8 +2381,8 @@
   ((#:arg10374 :foreign-address) (#:arg10379 :foreign-address)
    (#:arg10384 :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call Py_SymtableString
   ((str :foreign-address) (filename :foreign-address) (start :int))
@@ -2405,9 +2398,9 @@
   t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyErr_Display
-  ((#:arg10428 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg10433 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg10438 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg10428 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg10433 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg10438 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -2521,27 +2514,27 @@
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_CallObjectWithKeywords
-  ((callable (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (args (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (kwargs (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((callable (* PyObject) pyptr convert-python-ff-call/arg)
+   (args (* PyObject) pyptr convert-python-ff-call/arg)
+   (kwargs (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetBuiltins (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetGlobals (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetLocals (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetFrame (:void)
   :strings-convert nil :returning :foreign-address :allow-gc :always
@@ -2564,24 +2557,24 @@
   nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetFuncName
-  ((#:arg10775 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg10775 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_GetFuncDesc
-  ((#:arg10788 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg10788 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_EvalFrame
   ((#:arg10801 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_EvalFrameEx
   ((f :foreign-address) (exc :int)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_SaveThread (:void)
   :strings-convert nil :returning :foreign-address :allow-gc :always
@@ -2617,12 +2610,12 @@
 
 (foreign-functions:def-foreign-call PySys_GetObject
   ((#:arg10891 :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySys_SetObject
   ((#:arg10904 :foreign-address)
-   (#:arg10909 (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (#:arg10909 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -2649,7 +2642,7 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySys_AddWarnOptionUnicode
-  ((#:arg10987 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg10987 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   t :arg-checking nil)
 
@@ -2663,14 +2656,14 @@
 
 (foreign-functions:def-foreign-call PySys_GetXOptions (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyOS_FSPath
-  ((path (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((path (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyOS_InterruptOccurred (:void)
   :strings-convert nil :returning :int :allow-gc :always :call-direct
@@ -2694,107 +2687,106 @@
 
 (foreign-functions:def-foreign-call PyImport_ExecCodeModule
   ((name :foreign-address)
-   (co (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (co (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ExecCodeModuleEx
   ((name :foreign-address)
-   (co (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (co (* PyObject) pyptr convert-python-ff-call/arg)
    (pathname :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call
   PyImport_ExecCodeModuleWithPathnames
   ((name :foreign-address)
-   (co (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (co (* PyObject) pyptr convert-python-ff-call/arg)
    (pathname :foreign-address) (cpathname :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ExecCodeModuleObject
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (co (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (pathname (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (cpathname (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((name (* PyObject) pyptr convert-python-ff-call/arg)
+   (co (* PyObject) pyptr convert-python-ff-call/arg)
+   (pathname (* PyObject) pyptr convert-python-ff-call/arg)
+   (cpathname (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_GetModuleDict (:void)
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct nil :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_AddModuleObject
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((name (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_AddModule
   ((name :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ImportModule
   ((name :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ImportModuleNoBlock
   ((name :foreign-address)) :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ImportModuleLevel
   ((name :foreign-address)
-   (globals (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (locals (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (fromlist (* .PyObject.) PyObject convert-python-ff-call/arg)
+   (globals (* PyObject) pyptr convert-python-ff-call/arg)
+   (locals (* PyObject) pyptr convert-python-ff-call/arg)
+   (fromlist (* PyObject) pyptr convert-python-ff-call/arg)
    (level :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ImportModuleLevelObject
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (globals (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (locals (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (fromlist (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((name (* PyObject) pyptr convert-python-ff-call/arg)
+   (globals (* PyObject) pyptr convert-python-ff-call/arg)
+   (locals (* PyObject) pyptr convert-python-ff-call/arg)
+   (fromlist (* PyObject) pyptr convert-python-ff-call/arg)
    (level :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_GetImporter
-  ((path (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((path (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_Import
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((name (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ReloadModule
-  ((m (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((m (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_Cleanup (:void)
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_ImportFrozenModuleObject
-  ((name (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((name (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
@@ -2808,585 +2800,567 @@
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Call
-  ((callable (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (args (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (kwargs (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((callable (* PyObject) pyptr convert-python-ff-call/arg)
+   (args (* PyObject) pyptr convert-python-ff-call/arg)
+   (kwargs (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_CallObject
-  ((callable (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (args (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((callable (* PyObject) pyptr convert-python-ff-call/arg)
+   (args (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Type
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Size
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Length
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GetItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_SetItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (v (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg)
+   (v (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_DelItemString
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_DelItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_AsCharBuffer
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
    (buffer :foreign-address) (buffer_len :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_CheckReadBuffer
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_AsReadBuffer
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
    (buffer :foreign-address) (buffer_len :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_AsWriteBuffer
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
    (buffer :foreign-address) (buffer_len :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Format
-  ((obj (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (format_spec (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((obj (* PyObject) pyptr convert-python-ff-call/arg)
+   (format_spec (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_GetIter
-  ((#:arg11555 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg11555 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyIter_Check
-  ((#:arg11568 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg11568 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyIter_Next
-  ((#:arg11579 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg11579 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Check
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :int :allow-gc :always :call-direct t
-  :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :int :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyNumber_Add
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Subtract
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Multiply
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_MatrixMultiply
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_FloorDivide
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_TrueDivide
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Remainder
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Divmod
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Power
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o3 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o3 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Negative
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Positive
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Absolute
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Invert
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Lshift
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Rshift
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_And
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Xor
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Or
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyIndex_Check
-  ((#:arg11878 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg11878 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Index
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_AsSsize_t
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (exc (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (exc (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Long
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_Float
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceAdd
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceSubtract
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceMultiply
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceMatrixMultiply
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceFloorDivide
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceTrueDivide
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceRemainder
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlacePower
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o3 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o3 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceLshift
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceRshift
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceAnd
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceXor
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_InPlaceOr
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyNumber_ToBase
-  ((n (* .PyObject.) PyObject convert-python-ff-call/arg) (base :int))
+  ((n (* PyObject) pyptr convert-python-ff-call/arg) (base :int))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Check
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :int :allow-gc :always :call-direct t
-  :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :int :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PySequence_Size
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Length
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Concat
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Repeat
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (count Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_GetItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i Py_ssize_t))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_GetSlice
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i1 Py_ssize_t) (i2 Py_ssize_t))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i1 Py_ssize_t)
+   (i2 Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_SetItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i Py_ssize_t)
-   (v (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i Py_ssize_t)
+   (v (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_DelItem
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i Py_ssize_t))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_SetSlice
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i1 Py_ssize_t) (i2 Py_ssize_t)
-   (v (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i1 Py_ssize_t)
+   (i2 Py_ssize_t) (v (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_DelSlice
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (i1 Py_ssize_t) (i2 Py_ssize_t))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg) (i1 Py_ssize_t)
+   (i2 Py_ssize_t))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Tuple
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_List
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Fast
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (m :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Count
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (value (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (value (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Contains
-  ((seq (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (ob (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((seq (* PyObject) pyptr convert-python-ff-call/arg)
+   (ob (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_In
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (value (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (value (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_Index
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (value (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (value (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning Py_ssize_t :allow-gc :always
   :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_InPlaceConcat
-  ((o1 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (o2 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o1 (* PyObject) pyptr convert-python-ff-call/arg)
+   (o2 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySequence_InPlaceRepeat
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (count Py_ssize_t))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_Check
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning :int :allow-gc :always :call-direct t
-  :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning :int :allow-gc :always :call-direct t :arg-checking
+  nil)
 
 (foreign-functions:def-foreign-call PyMapping_Size
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_Length
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning Py_ssize_t :allow-gc :always
-  :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning Py_ssize_t :allow-gc :always :call-direct t
+  :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_HasKeyString
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_HasKey
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (key (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
+   (key (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_Keys
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_Values
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_Items
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)) :strings-convert
+  nil :returning ((* PyObject) pyptr convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_GetItemString
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyMapping_SetItemString
-  ((o (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((o (* PyObject) pyptr convert-python-ff-call/arg)
    (key :foreign-address)
-   (value (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (value (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_IsInstance
-  ((object (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (typeorclass (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((object (* PyObject) pyptr convert-python-ff-call/arg)
+   (typeorclass (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_IsSubclass
-  ((object (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (typeorclass (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((object (* PyObject) pyptr convert-python-ff-call/arg)
+   (typeorclass (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_EvalCode
-  ((#:arg12597 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg12602 (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (#:arg12607 (* .PyObject.) PyObject convert-python-ff-call/arg))
+  ((#:arg12597 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg12602 (* PyObject) pyptr convert-python-ff-call/arg)
+   (#:arg12607 (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_EvalCodeEx
-  ((co (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (globals (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (locals (* .PyObject.) PyObject convert-python-ff-call/arg)
+  ((co (* PyObject) pyptr convert-python-ff-call/arg)
+   (globals (* PyObject) pyptr convert-python-ff-call/arg)
+   (locals (* PyObject) pyptr convert-python-ff-call/arg)
    (args :foreign-address) (argc :int) (kwds :foreign-address)
    (kwdc :int) (defs :foreign-address) (defc :int)
-   (kwdefs (* .PyObject.) PyObject convert-python-ff-call/arg)
-   (closure (* .PyObject.) PyObject convert-python-ff-call/arg))
+   (kwdefs (* PyObject) pyptr convert-python-ff-call/arg)
+   (closure (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning
-  ((* .PyObject.) PyObject convert-python-ff-call/ret) :allow-gc
-  :always :call-direct t :arg-checking nil)
+  ((* PyObject) pyptr convert-python-ff-call/ret) :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyOS_string_to_double
   ((str :foreign-address) (endptr :foreign-address)
-   (overflow_exception (* .PyObject.) PyObject
-    convert-python-ff-call/arg))
+   (overflow_exception (* PyObject) pyptr convert-python-ff-call/arg))
   :strings-convert nil :returning :double :allow-gc :always
   :call-direct t :arg-checking nil)
 
