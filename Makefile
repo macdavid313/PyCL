@@ -37,7 +37,6 @@ lisp_path:
 .PHONY: clean
 clean:
 	find . -type f -name "*.fasl" -delete
-	rm -f sys/*.sexp sys/capi.cl
-	rm -f find_libpython.py
+	rm -f sys/*.sexp find_libpython.py
 
 # end
