@@ -48,7 +48,7 @@
              (if* (listp ftype)
                 then (cons (first param) ftype)
                 else (list (first param) ftype)))))
-    (when (to-translate-p)
+    (when (to-translate-p)              ; foreign definitions filter
       (destructuring-bind (_ name params return-type &optional variadic-p) form
         `(ff:def-foreign-call ,(intern name) ,(if params (mapcar #'translate-param params) '(:void))
            :strings-convert nil
