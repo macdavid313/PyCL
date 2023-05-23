@@ -1,9 +1,10 @@
 ;;;; init.cl
 (in-package #:pycl)
 
-(defvar-nonbindable *pycontext* nil)
+(defvar-nonbindable *python* nil
+  "A python interpreter instance.")
 
-(defvar-nonbindable *libpython-loaded-p* nil)
+(defconstant +minimum-python-version+ "3.6")
 
 (eval-when (:load-toplevel)
   (defparameter *find_libpython.py*
@@ -12,22 +13,20 @@
         (error "Missing file \"find_libpython.py\""))
       path)))
 
-(defun try-load-libpython (python-exe)
+(defun ensure-libpython-loaded (python-exe)
   "Try to load libpython shared object by executing find_libpython.py.
 `python find_libpython.py --list-all` will return a list of candidates among
 which we will try to load one by one. If anything is loaded without raising an
 error, we will return the loaded libpython's pathname; otherwise, we raise an
 error."
-  (when (not *libpython-loaded-p*)
-    (multiple-value-bind (candidates stderr exit)
-        (excl.osi:command-output (string+ python-exe #\Space *find_libpython.py* #\Space "--list-all"))
-      (when (not (zerop exit))
-        (error "Cannot find libpython shared object by executing find_libpython.py:~%~a" (apply 'string+ stderr)))
-      (dolist (lib candidates)
-        (when (ignore-errors (load lib :foreign t))
-          (setf *libpython-loaded-p* lib)
-          (return-from try-load-libpython lib)))
-      (error "Cannot load libpython shared object from these: ~a" candidates))))
+  (multiple-value-bind (candidates stderr exit)
+      (excl.osi:command-output (string+ python-exe #\Space *find_libpython.py* #\Space "--list-all"))
+    (when (not (zerop exit))
+      (error "Cannot find libpython shared object by executing find_libpython.py:~%~a" (apply 'string+ stderr)))
+    (dolist (lib candidates)
+      (when (ignore-errors (load lib :foreign t))
+        (return-from ensure-libpython-loaded lib)))
+    (error "Cannot load libpython shared object from these: ~a" candidates)))
 
 (defun find-python-program (python-exe)
   (let ((script "import sys; print(sys.executable)"))
@@ -69,50 +68,36 @@ else:
       (error "Cannot get the python version by running \"~a --version\":~%~a" python-exe stderr))
     (second (split-re " " (first version)))))
 
-(defstruct pycontext
-  lib
-  exe
-  program
-  home
-  version
-  initialized-p
-  finalized-p)
+(defstruct python
+  (lib     "" :type simple-string)
+  (exe     "" :type simple-string)
+  (program "" :type simple-string)
+  (home    "" :type simple-string)
+  (version "" :type simple-string))
 
+(defmethod print-object ((py python) stream)
+  (with-slots (lib exe program home version) py
+    (print-unreadable-object (py stream :type t :identity nil)
+      (with-stack-list (metadata (cons 'lib lib)
+                                 (cons 'exe exe)
+                                 (cons 'program program)
+                                 (cons 'home home)
+                                 (cons 'version version))
+        (pprint metadata stream)))))
 
-(defmethod print-object ((ctx pycontext) stream)
-  (with-slots (initialized-p finalized-p) ctx
-    (print-unreadable-object (ctx stream :type t :identity t)
-      (format stream
-              (if* initialized-p
-                 then "INITIALIZED"
-               elseif finalized-p
-                 then "FINALIZED"
-                 else "ERROR")))))
-
-(defun pycontext-to-alist (ctx)
-  (declare (type pycontext ctx))
-  (with-slots (lib exe program home version initialized-p finalized-p) ctx
-    (list (cons 'lib lib)
-          (cons 'exe exe)
-          (cons 'program program)
-          (cons 'home home)
-          (cons 'version version)
-          (cons 'initialized-p initialized-p)
-          (cons 'finalized-p finalized-p))))
-
-(defun init-global-pointers ()
-  "A hacky way to initialize libpython foreign pointers by a list of their names."
-  (labels ((gen ()
-             "Generate all the top-level bindings."
-             `(lambda ()
-                (progn ,@(loop for var in +libpython-foreign-pointers+
-                               collect
-                               #+(version>= 11 0)
-                               `(def-foreign-constant ,(intern (string+ var "Ptr")) :type :unsigned-nat)
-                               #-(version>= 11 0)
-                               `(def-foreign-variable ,(intern (string+ var "Ptr")) :type :unsigned-natural))))))
-    (funcall (gen))
-    t))
+(defmethod initialize-instance :after ((py python) &rest args)
+  (declare (ignore args))
+  (flet ((init-global-pointers ()
+           "Generate all the top-level bindings."
+           `(lambda ()
+              "A hacky way to initialize libpython foreign pointers by a list of their names."
+              (progn ,@(loop for var in pycl.sys:+libpython-foreign-pointers+
+                             collect
+                             #+(version>= 11 0)
+                             `(def-foreign-constant ,(intern (string+ var "Ptr")) :type :unsigned-nat)
+                             #-(version>= 11 0)
+                             `(def-foreign-variable ,(intern (string+ var "Ptr")) :type :unsigned-natural))))))
+    (funcall (init-global-pointers))))
 
 (defun init-py-program-name (program)
   (with-native-string (program* program)
@@ -132,36 +117,39 @@ else:
           (error "Error from calling Py_DecodeLocale on arg: ~a" home*))
         (Py_SetPythonHome w)))))
 
-(defun init-pycontext (&optional (python-exe #+windows "python.exe"
-                                             #-windows "python"))
-  (if* *pycontext*
-     then (error "*pycontext* is non-nil: ~a" *pycontext*)
-     else (let ((lib (try-load-libpython python-exe))
-                (program (find-python-program python-exe))
-                (home (find-python-home python-exe))
-                (version (get-python-version python-exe)))
-            (setf (sys:getenv "PYTHONIOENCODING") "UTF-8"
-                  (sys:getenv "PYTHONHOME") nil)
-            (init-py-program-name program) ; Py_SetProgramName
-            (init-py-home home)            ; Py_SetPythonHome
-            (Py_InitializeEx 0)            ; Call 'Py_InitializeEx
-            (when (not (Py_IsInitialized))
-              (error "pycontext initialization failed after calling 'Py_InitializeEx"))
-            (init-global-pointers)      ; Initialize foreign pointers
-            (setq *pycontext*           ; Initialize *pycontext*
-                  (make-pycontext :lib lib
-                                  :exe python-exe
-                                  :program program
-                                  :home home
-                                  :version version
-                                  :initialized-p t
-                                  :finalized-p nil))
-            *pycontext*)))
+(defun start-python (&optional (python-exe #+windows "python.exe"
+                                           #-windows "python"))
+  (if* *python*
+     then (error "*python* is non-nil: ~a" *python*)
+     else (let ((version (get-python-version python-exe))
+                lib
+                program
+                home)
+            (when (string< version +minimum-python-version+)
+              (error "Minimum python version: ~s, but got ~s from ~s"
+                     +minimum-python-version+ version python-exe))
+            (setq lib (ensure-libpython-loaded python-exe))
+            (handler-case
+                (progn (setq program (find-python-program python-exe)
+                             home (find-python-home python-exe))
+                       (setf (sys:getenv "PYTHONIOENCODING") "UTF-8"
+                             (sys:getenv "PYTHONHOME") nil)
+                       (init-py-program-name program) ; Py_SetProgramName
+                       (init-py-home home)            ; Py_SetPythonHome
+                       (Py_InitializeEx 0)            ; Call 'Py_InitializeEx
+                       (when (not (Py_IsInitialized))
+                         (error "Python initialization failed after calling 'Py_InitializeEx"))
+                       (setf *python*   ; Initialize *python*
+                             (make-python :lib lib
+                                          :exe python-exe
+                                          :program program
+                                          :home home
+                                          :version version))
+                       *python*)
+              (error () (unload-foreign-library lib))))))
 
-(defun finalize-pycontext (ctx)
-  (declare (type pycontext ctx))
+(defun shutdown-python (py)
+  (check-type py python)
   (Py_FinalizeEx)
-  (setf (pycontext-initialized-p ctx) nil
-        (pycontext-finalized-p ctx) t)
-  ctx)
-
+  (unload-foreign-library (python-lib *python*))
+  (setf *python* nil))

@@ -9,19 +9,17 @@
         #:pycl.sys)
   (:export
    ;; init
-   #:*pycontext*
+   #:*python*
    #:*libpython-loaded-p*
-   #:pycontext
-   #:pycontext-p
-   #:pycontext-lib
-   #:pycontext-exe
-   #:pycontext-program
-   #:pycontext-home
-   #:pycontext-version
-   #:pycontext-initialized-p
-   #:pycontext-finalized-p
-   #:init-pycontext
-   #:finalize-pycontext
+   #:python
+   #:python-p
+   #:python-lib
+   #:python-exe
+   #:python-program
+   #:python-home
+   #:python-version
+   #:start-python
+   #:shutdown-python
    ;; pyobject
    ;; #:pyobject #:to-pyobject #:from-pyobject #:pyobject-eq #:pynull-p
    ;; #:pyincref #:pydecref #:pytypep #:pytype-of
