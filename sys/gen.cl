@@ -42,8 +42,8 @@
                   (not (find name '("PyBytes_FromFormatV" "PyUnicode_FromFormatV" "PyErr_FormatV" "PyOS_vsnprintf")
                              :test 'string=)))))
          (translate-param (param)
-           (when (= 1 (length param))
-             (setq param (cons (gensym "arg") param)))
+           (when (= 1 (length param))   ; anonymous argument
+             (setq param (cons nil param)))
            (let ((ftype (translate-foreign-type (second param))))
              (if* (listp ftype)
                 then (cons (first param) ftype)
