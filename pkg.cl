@@ -1,6 +1,8 @@
 ;;;; pkg.cl
 (in-package #:cl-user)
 
+#-asdf (require :asdf)
+
 (use-package 'util.string)
 
 (eval-when (:load-toplevel :execute)
@@ -26,15 +28,5 @@
 
 (defun build-pycl ()
   (compile-and-load-pycl)
-  (let ((buffer (make-array 4096 :element-type '(unsigned-byte 8))))
-    (with-open-file (fasl-out *pycl-fasl-output*
-                              :direction :output
-                              :element-type '(unsigned-byte 8)
-                              :if-exists :supersede
-                              :if-does-not-exist :create)
-      (dolist (file *pycl-src-files*)
-        (with-open-file (fasl-in (string+ file ".fasl")
-                                 :direction :input)
-          (loop for offset = (read-sequence buffer fasl-in)
-                while (not (zerop offset))
-                do (write-sequence buffer fasl-out :end offset)))))))
+  (uiop:concatenate-files (mapcar (lambda (f) (string+ f ".fasl")) *pycl-src-files*)
+                          *pycl-fasl-output*))
