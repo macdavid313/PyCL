@@ -10,10 +10,9 @@
   (:export
    ;; init
    #:*python*
-   #:*libpython-loaded-p*
    #:python
    #:python-p
-   #:python-lib
+   #:python-libpython
    #:python-exe
    #:python-program
    #:python-home

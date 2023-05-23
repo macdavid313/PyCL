@@ -69,21 +69,21 @@ else:
     (second (split-re " " (first version)))))
 
 (defstruct python
-  (lib     "" :type simple-string)
-  (exe     "" :type simple-string)
-  (program "" :type simple-string)
-  (home    "" :type simple-string)
-  (version "" :type simple-string))
+  (libpython     "" :type simple-string)
+  (exe           "" :type simple-string)
+  (program       "" :type simple-string)
+  (home          "" :type simple-string)
+  (version       "" :type simple-string))
 
 (defmethod print-object ((py python) stream)
-  (with-slots (lib exe program home version) py
-    (print-unreadable-object (py stream :type t :identity nil)
-      (with-stack-list (metadata (cons 'lib lib)
-                                 (cons 'exe exe)
-                                 (cons 'program program)
-                                 (cons 'home home)
-                                 (cons 'version version))
-        (pprint metadata stream)))))
+  (with-slots (libpython exe program home version) py
+    (print-unreadable-object (py stream :type t :identity t)
+      (with-stack-list (lines (string+ "LIBPYTHON: "   libpython)
+                              (string+ "  EXE:       " exe)
+                              (string+ "  PROGRAM:   " program)
+                              (string+ "  HOME:      " home)
+                              (string+ "  VERSION:   " version))
+        (format stream "~{~a~^~%~}~%" lines)))))
 
 (defmethod initialize-instance :after ((py python) &rest args)
   (declare (ignore args))
@@ -122,13 +122,13 @@ else:
   (if* *python*
      then (error "*python* is non-nil: ~a" *python*)
      else (let ((version (get-python-version python-exe))
-                lib
+                libpython
                 program
                 home)
             (when (string< version +minimum-python-version+)
               (error "Minimum python version: ~s, but got ~s from ~s"
                      +minimum-python-version+ version python-exe))
-            (setq lib (ensure-libpython-loaded python-exe))
+            (setq libpython (ensure-libpython-loaded python-exe))
             (handler-case
                 (progn (setq program (find-python-program python-exe)
                              home (find-python-home python-exe))
@@ -140,15 +140,15 @@ else:
                        (when (not (Py_IsInitialized))
                          (error "Python initialization failed after calling 'Py_InitializeEx"))
                        (setf *python*   ; Initialize *python*
-                             (make-python :lib lib
+                             (make-python :libpython libpython
                                           :exe python-exe
                                           :program program
                                           :home home
                                           :version version))
                        *python*)
-              (error () (unload-foreign-library lib))))))
+              (error () (unload-foreign-library libpython))))))
 
 (defun shutdown-python ()
   (Py_FinalizeEx)
-  (unload-foreign-library (python-lib *python*))
+  (unload-foreign-library (python-libpython *python*))
   (setf *python* nil))
