@@ -18,19 +18,28 @@ RUN echo "Install system dependencies ..."; \
         llvm-${llvm_version} \
         clang-${llvm_version} \
         libclang-${llvm_version}-dev \
-        libclang-cpp${llvm_version}-dev; \
-    git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
+        libclang-cpp${llvm_version}-dev
 
 RUN echo "Building Python ${python_version} ..."; \
     set -eux; \
     \
-    apt-get install -y \
-        build-essential libssl-dev zlib1g-dev \
-        libbz2-dev libreadline-dev libsqlite3-dev curl \
-        libncursesw5-dev xz-utils tk-dev libxml2-dev \
-        libxmlsec1-dev libffi-dev liblzma-dev; \
-    env CC=clang-${llvm_version} PYTHON_CONFIGURE_OPTS="--enable-shared" \
-        pyenv install ${python_version}; \
+    git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}; \
+    apt-get install --yes \
+        build-essential \
+        libssl-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        libreadline-dev \
+        libsqlite3-dev \
+        curl \
+        libncursesw5-dev \
+        xz-utils \
+        tk-dev \
+        libxml2-dev \
+        libxmlsec1-dev \
+        libffi-dev \
+        liblzma-dev; \
+    env CC=clang-${llvm_version} pyenv install ${python_version}; \
     pyenv global ${python_version}; \
     pyenv rehash; \
     python --version; \
@@ -56,8 +65,11 @@ WORKDIR /opt/workspace
 CMD set -eux; \
     \
     export PKG_CONFIG_PATH=$(python -c "import sys; print(sys.prefix)")/lib/pkgconfig; \
+    printf "#define PY_SSIZE_T_CLEAN\n#define Py_LIMITED_API ${Py_LIMITED_API}\n#include <Python.h>\n" >wrapper.h; \
+    cat wrapper.h; \
     c2ffi wrapper.h \
         --sys-include $(pkg-config --cflags python3 | cut -c3-) \
         --driver sexp \
         --warn-as-error \
-        --fail-on-error >libpython.binding.sexp
+        --fail-on-error >libpython.binding.sexp; \
+    rm wrapper.h

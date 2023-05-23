@@ -9,7 +9,8 @@
 LISP=
 
 DOCKER=podman
-PYTHON_VERSION=3.8
+PYTHON_VERSION=3.6
+Py_LIMITED_API=0x03060000
 LLVM_VERSION=14
 BINDING_BUILDER_IMAGE=pycl.binding.builder
 
@@ -28,7 +29,9 @@ sys/libpython.binding.sexp:
 		--tag $(BINDING_BUILDER_IMAGE):py$(PYTHON_VERSION) \
 		--file sys/Dockerfile \
 		sys/
-	$(DOCKER) run --rm -v $(shell pwd)/sys:/opt/workspace $(BINDING_BUILDER_IMAGE):py$(PYTHON_VERSION)
+	$(DOCKER) run --rm --env Py_LIMITED_API=$(Py_LIMITED_API) \
+		-v $(shell pwd)/sys:/opt/workspace \
+		$(BINDING_BUILDER_IMAGE):py$(PYTHON_VERSION)
 
 .PHONY: lisp_path
 lisp_path:
