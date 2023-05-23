@@ -1,4 +1,4 @@
-;;;; definitions.cl
+;;;; types.cl
 (in-package #:pycl.sys)
 
 (def-foreign-type Py_ssize_t :nat)

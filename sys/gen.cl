@@ -25,9 +25,11 @@
               (t x)))
     (list (case (first x)
             (:pointer (case (second x)
-                        (PyObject `((* PyObject) ; foreign type
-                                    pyptr        ; lisp type
-                                    ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
+                        ;; see https://peps.python.org/pep-0384/#structures
+                        ((PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef PyModuleDefBase PyModuleDef PyStructSequence_Field PyStructSequence_Desc PyType_Slot PyType_Spec)
+                         `((* ,(second x))    ; foreign type
+                           ff:foreign-pointer ; lisp type
+                           ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
                         (size_t '((* :unsigned-nat)))
                         (t :foreign-address)))
             (t (error "don't know how to translate compound type ~s" x))))))

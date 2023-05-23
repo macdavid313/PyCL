@@ -9,8 +9,8 @@
   (defparameter *pycl-src-files*
     (let ((files '(;; start of files list
                    "sys/package"
-                   "sys/definitions"
-                   "sys/pyptr"
+                   "sys/types"
+                   "sys/conversion"
                    "sys/capi"
                    "pycl/package"
                    "pycl/init"
