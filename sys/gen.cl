@@ -14,7 +14,7 @@
             (push (symbol-name sym) collected)))))
     collected))
 
-(defun translate-foreign-type (x)
+(defun translate-foreign-type (x &key ret)
   (etypecase x
     (keyword (case x
                ((:function-pointer :pointer) :foreign-address)
@@ -24,7 +24,12 @@
               (size_t :unsigned-nat)
               (t x)))
     (list (case (first x)
-            (:pointer :foreign-address)
+            (:pointer (case (second x)
+                        (PyObject `((* .PyObject.) ; foreign type
+                                    PyObject       ; lisp type
+                                    ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
+                        (size_t '((* :unsigned-nat)))
+                        (t :foreign-address)))
             (t (error "don't know how to translate compound type ~s" x))))))
 
 (defun has-variadic-args-p (name))
@@ -47,7 +52,7 @@
       (destructuring-bind (_ name params return-type &optional variadic-p) form
         `(ff:def-foreign-call ,(intern name) ,(if params (mapcar #'translate-param params) '(:void))
            :strings-convert nil
-           :returning ,(translate-foreign-type return-type)
+           :returning ,(translate-foreign-type return-type :ret t)
            :allow-gc :always
            :call-direct ,(not (null params))
            :arg-checking nil)))))
