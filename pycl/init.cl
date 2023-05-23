@@ -148,8 +148,7 @@ else:
                        *python*)
               (error () (unload-foreign-library lib))))))
 
-(defun shutdown-python (py)
-  (check-type py python)
+(defun shutdown-python ()
   (Py_FinalizeEx)
   (unload-foreign-library (python-lib *python*))
   (setf *python* nil))
