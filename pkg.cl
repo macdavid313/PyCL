@@ -8,7 +8,9 @@
 (eval-when (:load-toplevel :execute)
   (defparameter *pycl-src-files*
     (let ((files '(;; start of files list
-                   "sys/sys"
+                   "sys/package"
+                   "sys/definitions"
+                   "sys/pyptr"
                    "sys/capi"
                    "pycl/package"
                    "pycl/init"
