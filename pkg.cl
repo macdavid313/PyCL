@@ -14,6 +14,8 @@
                    "sys/capi"
                    "pycl/package"
                    "pycl/init"
+                   "pycl/conditions"
+                   "pycl/object"
                    ;; files list ends here
                    )))
       (mapcar (lambda (file)
@@ -25,8 +27,9 @@
 
 (defun compile-and-load-pycl ()
   (dolist (file *pycl-src-files*)
-    (compile-file (string+ file ".cl")
-                  :load-after-compile t)))
+    (load
+     (compile-file-if-needed (string+ file ".cl")
+                             :load-after-compile nil))))
 
 (defun build-pycl ()
   (compile-and-load-pycl)
