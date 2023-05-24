@@ -30,6 +30,7 @@
                          `((* ,(second x))    ; foreign type
                            ff:foreign-pointer ; lisp type
                            ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
+                        (:char '((* :char) #+32bit (unsigned-byte 32) #+64bit (unsigned-byte 64))) ; char*
                         (size_t '((* :unsigned-nat)))
                         (t :foreign-address)))
             (t (error "don't know how to translate compound type ~s" x))))))
