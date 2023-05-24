@@ -139,7 +139,7 @@ It does:
             (handler-case
                 (progn (setq program (find-python-program python-exe)
                              home (find-python-home python-exe))
-                       (setf (sys:getenv "PYTHONIOENCODING") "UTF-8"
+                       (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
                              (sys:getenv "PYTHONHOME") nil)
                        (init-py-program-name program) ; Py_SetProgramName
                        (init-py-home home)            ; Py_SetPythonHome
