@@ -35,29 +35,26 @@
                         (t :foreign-address)))
             (t (error "don't know how to translate compound type ~s" x))))))
 
-(defun has-variadic-args-p (name))
-
 (defun translate-foreign-function (form)
-  (flet ((to-translate-p ()
-           (destructuring-bind (_ name params return-type &optional variadic-p) form
+  (destructuring-bind (_ name args return-type &optional variadic-p) form
+    (flet ((to-translate-p ()
              (and (not variadic-p)
-                  (match-re "^Py" name :case-fold nil)
                   (not (find name '("PyBytes_FromFormatV" "PyUnicode_FromFormatV" "PyErr_FormatV" "PyOS_vsnprintf")
-                             :test 'string=)))))
-         (translate-param (param)
-           (when (= 1 (length param))   ; anonymous argument
-             (setq param (cons nil param)))
-           (let ((ftype (translate-foreign-type (second param))))
-             (if* (listp ftype)
-                then (cons (first param) ftype)
-                else (list (first param) ftype)))))
-    (when (to-translate-p)              ; foreign definitions filter
-      (destructuring-bind (_ name params return-type &optional variadic-p) form
-        `(ff:def-foreign-call ,(intern name) ,(if params (mapcar #'translate-param params) '(:void))
+                             :test 'string=))
+                  (match-re "^Py" name :case-fold nil)))
+           (translate-arg (arg)
+             (when (= 1 (length arg))   ; anonymous argument
+               (setq arg (cons nil arg)))
+             (let ((ftype (translate-foreign-type (second arg))))
+               (if* (listp ftype)
+                  then (cons (first arg) ftype)
+                  else (list (first arg) ftype)))))
+      (when (to-translate-p)            ; foreign definitions filter
+        `(ff:def-foreign-call ,(intern name) ,(if args (mapcar #'translate-arg args) '(:void))
            :strings-convert nil
            :returning ,(translate-foreign-type return-type :ret t)
            :allow-gc :always
-           :call-direct ,(not (null params))
+           :call-direct ,(not (null args))
            :arg-checking nil)))))
 
 (defun write-form (form)
