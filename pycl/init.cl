@@ -4,6 +4,17 @@
 (defvar-nonbindable *python* nil
   "A python interpreter instance.")
 
+(defvar-nonbindable *pyglobalptr*
+    (make-hash-table :test 'eq :size (length pycl.sys:+libpython-foreign-pointers+))
+  "A hash table where key is the global pointer's name and the value is its foreign address")
+
+(defun pyglobalptr (k)
+  (multiple-value-bind (v exists-p)
+      (gethash k *pyglobalptr*)
+    (if* exists-p
+       then v
+       else (error "Global pointer ~s has not been initialized!"))))
+
 (defconstant +minimum-python-version+ "3.6")
 
 (eval-when (:load-toplevel)
@@ -85,19 +96,15 @@ else:
                               (string+ "  VERSION:   " version))
         (format stream "~{~a~^~%~}~%" lines)))))
 
-(defmethod initialize-instance :after ((py python) &rest args)
-  (declare (ignore args))
-  (flet ((init-global-pointers ()
-           "Generate all the top-level bindings."
-           `(lambda ()
-              "A hacky way to initialize libpython foreign pointers by a list of their names."
-              (progn ,@(loop for var in pycl.sys:+libpython-foreign-pointers+
-                             collect
-                             #+(version>= 11 0)
-                             `(def-foreign-constant ,(intern (string+ var "Ptr")) :type :unsigned-nat)
-                             #-(version>= 11 0)
-                             `(def-foreign-variable ,(intern (string+ var "Ptr")) :type :unsigned-natural))))))
-    (funcall (init-global-pointers))))
+(defun startup ()
+  "This function runs after a python instance has been successfully initialized.
+It does:
+  1. initialize global pointers"
+  (dolist (name pycl.sys:+libpython-foreign-pointers+)
+    (setf (gethash (intern name) *pyglobalptr*)
+          (fslot-value-typed :unsigned-nat              ; type
+                             :c                         ; allocation
+                             (get-entry-point name))))) ; address
 
 (defun init-py-program-name (program)
   (with-native-string (program* program)
@@ -146,7 +153,10 @@ else:
                                           :home home
                                           :version version))
                        *python*)
-              (error () (unload-foreign-library libpython))))))
+              (error () (unload-foreign-library libpython)))
+            ;; run startup operations
+            (startup)
+            *python*)))
 
 (defun shutdown-python ()
   (Py_FinalizeEx)
