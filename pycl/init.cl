@@ -96,6 +96,24 @@ else:
                               (string+ "  VERSION:   " version))
         (format stream "~{~a~^~%~}~%" lines)))))
 
+(defun init-python-program-name (program)
+  (with-native-string (program* program)
+    (let (w)
+      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
+        (setq w (Py_DecodeLocale program* size*))
+        (when (zerop w)
+          (error "Error from calling Py_DecodeLocale on arg: ~a" program*))
+        (Py_SetProgramName w)))))
+
+(defun init-python-home (home)
+  (with-native-string (home* home)
+    (let (w)
+      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
+        (setq w (Py_DecodeLocale home* size*))
+        (when (zerop w)
+          (error "Error from calling Py_DecodeLocale on arg: ~a" home*))
+        (Py_SetPythonHome w)))))
+
 (defun startup ()
   "This function runs after a python instance has been successfully initialized.
 It does:
@@ -105,24 +123,6 @@ It does:
           (fslot-value-typed :unsigned-nat              ; type
                              :c                         ; allocation
                              (get-entry-point name))))) ; address
-
-(defun init-py-program-name (program)
-  (with-native-string (program* program)
-    (let (w)
-      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
-        (setq w (Py_DecodeLocale program* size*))
-        (when (zerop w)
-          (error "Error from calling Py_DecodeLocale on arg: ~a" program*))
-        (Py_SetProgramName w)))))
-
-(defun init-py-home (home)
-  (with-native-string (home* home)
-    (let (w)
-      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
-        (setq w (Py_DecodeLocale home* size*))
-        (when (zerop w)
-          (error "Error from calling Py_DecodeLocale on arg: ~a" home*))
-        (Py_SetPythonHome w)))))
 
 (defun start-python (&optional (python-exe #+windows "python.exe"
                                            #-windows "python"))
@@ -141,8 +141,8 @@ It does:
                              home (find-python-home python-exe))
                        (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
                              (sys:getenv "PYTHONHOME") nil)
-                       (init-py-program-name program) ; Py_SetProgramName
-                       (init-py-home home)            ; Py_SetPythonHome
+                       (init-python-program-name program) ; Py_SetProgramName
+                       (init-python-home home)            ; Py_SetPythonHome
                        (Py_InitializeEx 0)            ; Call 'Py_InitializeEx
                        (when (not (Py_IsInitialized))
                          (error "Python initialization failed after calling 'Py_InitializeEx"))
