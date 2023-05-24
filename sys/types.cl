@@ -60,6 +60,11 @@
      (m_index Py_ssize_t)
      (m_copy (* PyObject))))
 
+(def-foreign-type PyModuleDef_Slot
+    (:struct
+     (slot :int)
+     (value (* :void))))
+
 (def-foreign-type PyModuleDef
     (:struct
      (m_base PyModuleDef_Base)
@@ -67,7 +72,7 @@
      (m_doc (* :char))
      (m_size Py_ssize_t)
      (m_methods (* PyMethodDef))
-     (m_slots (* (:struct (slot :int) (value (* :void))))) ; PyModuleDef_Slot
+     (m_slots (* PyModuleDef_Slot))
      (m_traverse (* :void))
      (m_clear (* :void))
      (m_free (* :void))))
