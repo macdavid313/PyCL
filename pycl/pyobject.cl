@@ -1,4 +1,4 @@
-;;;; object.cl
+;;;; pyobject.cl
 (in-package #:pycl)
 
 (defun pyobject-p (thing)
