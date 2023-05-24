@@ -42,4 +42,6 @@ clean:
 	find . -type f -name "*.fasl" -delete
 	rm -f sys/*.sexp find_libpython.py
 
+.DEFAULT_GOAL := pycl.fasl
+
 # end
