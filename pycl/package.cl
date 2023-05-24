@@ -19,7 +19,8 @@
    #:python-version
    #:start-python
    #:shutdown-python
-   ;; pyobject
-   ;; #:pyobject #:to-pyobject #:from-pyobject #:pyobject-eq #:pynull-p
-   ;; #:pyincref #:pydecref #:pytypep #:pytype-of
+   ;; conditions
+   #:pycl-condition
+   #:python-error
+   #:pycl-error
    ))

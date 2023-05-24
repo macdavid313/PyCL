@@ -1,4 +1,4 @@
-;;;; condition.cl
+;;;; conditions.cl
 (in-package #:pycl)
 
 (define-condition pycl-condition (condition)
@@ -48,8 +48,8 @@
   (err)
   (:report report-pycl-condition))
 
-(defmethod report-pycl-condition ((e pycl-error) stream)
-  (print-unreadable-object (c stream :type t :identity nil)
+(defmethod report-pycl-condition ((err pycl-error) stream)
+  (print-unreadable-object (err stream :type t :identity nil)
     (write-string (string+ "(in a Lisp function called from Python)"
                            #\Newline
                            "Lisp: "
