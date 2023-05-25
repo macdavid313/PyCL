@@ -21,14 +21,14 @@
   (= (foreign-pointer-address x)
      (foreign-pointer-address y)))
 
-(defun pynull (o)
-  (check-type o pyobject)
-  (zerop (foreign-pointer-address o)))
+(defun pynull (ob)
+  (check-type ob pyobject)
+  (zerop (foreign-pointer-address ob)))
 
-(defun pystealref (o)
-  (declare (type pyobject o))
-  (let ((original-fp (foreign-pointer-address o)))
-    (setf (foreign-pointer-address o) 0)
+(defun pystealref (ob)
+  (declare (type pyobject ob))
+  (let ((original-fp (foreign-pointer-address ob)))
+    (setf (foreign-pointer-address ob) 0)
     original-fp))
 
 ;;; lifetime management --------
