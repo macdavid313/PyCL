@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim as binding_generator
+FROM debian:bookworm-slim
 
 ARG python_version
 ARG llvm_version
@@ -19,6 +19,20 @@ RUN echo "Install system dependencies ..."; \
         clang-${llvm_version} \
         libclang-${llvm_version}-dev \
         libclang-cpp${llvm_version}-dev
+
+RUN echo "Installing c2ffi ..." \
+    set -eux; \
+    \
+    cd /usr/local/src; \
+    git clone https://github.com/rpav/c2ffi.git /usr/local/src/c2ffi -b llvm-${llvm_version}.0.0; \
+    cd c2ffi; \
+    mkdir -p build; \
+    cd build; \
+    cmake -DBUILD_CONFIG=Release -DCMAKE_CXX_COMPILER=clang++-${llvm_version} ../; \
+    cmake --build . --parallel $(nproc); \
+    cmake --build . --target install; \
+    cd $HOME; \
+    rm -rf /usr/local/src/c2ffi
 
 RUN echo "Building Python ${python_version} ..."; \
     set -eux; \
@@ -44,20 +58,6 @@ RUN echo "Building Python ${python_version} ..."; \
     pyenv rehash; \
     python --version; \
     python -m pip install --no-cache-dir --quiet -U pip setuptools
-
-RUN echo "Installing c2ffi ..." \
-    set -eux; \
-    \
-    cd /usr/local/src; \
-    git clone https://github.com/rpav/c2ffi.git /usr/local/src/c2ffi -b llvm-${llvm_version}.0.0; \
-    cd c2ffi; \
-    mkdir -p build; \
-    cd build; \
-    cmake -DBUILD_CONFIG=Release -DCMAKE_CXX_COMPILER=clang++-${llvm_version} ../; \
-    cmake --build . --parallel $(nproc); \
-    cmake --build . --target install; \
-    cd $HOME; \
-    rm -rf /usr/local/src/c2ffi
 
 # Generate bindings manifest
 VOLUME /opt/workspace

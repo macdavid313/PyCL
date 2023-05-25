@@ -15,7 +15,7 @@
        then v
        else (error "Global pointer ~s has not been initialized!"))))
 
-(defconstant +minimum-python-version+ "3.6")
+(defconstant +minimum-python-version+ "3.7")
 
 (eval-when (:load-toplevel)
   (defparameter *find_libpython.py*

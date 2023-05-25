@@ -1962,6 +1962,111 @@
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct t :arg-checking nil)
 
+(foreign-functions:def-foreign-call PyThread_init_thread (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_start_new_thread
+  ((nil :foreign-address) (nil :foreign-address)) :strings-convert nil
+  :returning :unsigned-long :allow-gc :always :call-direct t
+  :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_exit_thread (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_get_thread_ident (:void)
+  :strings-convert nil :returning :unsigned-long :allow-gc :always
+  :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_allocate_lock (:void)
+  :strings-convert nil :returning PyThread_type_lock :allow-gc :always
+  :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_free_lock
+  ((nil PyThread_type_lock)) :strings-convert nil :returning :void
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_acquire_lock
+  ((nil PyThread_type_lock) (nil :int)) :strings-convert nil :returning
+  :int :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_acquire_lock_timed
+  ((nil PyThread_type_lock) (microseconds :long-long) (intr_flag :int))
+  :strings-convert nil :returning PyLockStatus :allow-gc :always
+  :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_release_lock
+  ((nil PyThread_type_lock)) :strings-convert nil :returning :void
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_get_stacksize (:void)
+  :strings-convert nil :returning :unsigned-nat :allow-gc :always
+  :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_set_stacksize
+  ((nil :unsigned-nat)) :strings-convert nil :returning :int :allow-gc
+  :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_GetInfo (:void)
+  :strings-convert nil :returning
+  ((* PyObject) (satisfies foreign-functions:foreign-address-p)
+   convert-python-ff-call/ret)
+  :allow-gc :always :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_create_key (:void)
+  :strings-convert nil :returning :int :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_delete_key ((key :int))
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_set_key_value
+  ((key :int) (value :foreign-address)) :strings-convert nil :returning
+  :int :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_get_key_value ((key :int))
+  :strings-convert nil :returning :foreign-address :allow-gc :always
+  :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_delete_key_value
+  ((key :int)) :strings-convert nil :returning :void :allow-gc :always
+  :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_ReInitTLS (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_alloc (:void)
+  :strings-convert nil :returning :foreign-address :allow-gc :always
+  :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_free
+  ((key :foreign-address)) :strings-convert nil :returning :void
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_is_created
+  ((key :foreign-address)) :strings-convert nil :returning :int
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_create
+  ((key :foreign-address)) :strings-convert nil :returning :int
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_delete
+  ((key :foreign-address)) :strings-convert nil :returning :void
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_set
+  ((key :foreign-address) (value :foreign-address)) :strings-convert
+  nil :returning :int :allow-gc :always :call-direct t :arg-checking
+  nil)
+
+(foreign-functions:def-foreign-call PyThread_tss_get
+  ((key :foreign-address)) :strings-convert nil :returning
+  :foreign-address :allow-gc :always :call-direct t :arg-checking nil)
+
 (foreign-functions:def-foreign-call PyInterpreterState_New (:void)
   :strings-convert nil :returning :foreign-address :allow-gc :always
   :call-direct nil :arg-checking nil)
@@ -1972,6 +2077,10 @@
 
 (foreign-functions:def-foreign-call PyInterpreterState_Delete
   ((nil :foreign-address)) :strings-convert nil :returning :void
+  :allow-gc :always :call-direct t :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyInterpreterState_GetID
+  ((nil :foreign-address)) :strings-convert nil :returning :long-long
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyState_AddModule
@@ -2022,7 +2131,7 @@
   :allow-gc :always :call-direct nil :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyThreadState_SetAsyncExc
-  ((nil :long)
+  ((nil :unsigned-long)
    (nil (* PyObject) (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
@@ -2079,6 +2188,20 @@
    (step :foreign-address) (slicelength :foreign-address))
   :strings-convert nil :returning :int :allow-gc :always :call-direct t
   :arg-checking nil)
+
+(foreign-functions:def-foreign-call PySlice_Unpack
+  ((slice (* PyObject) (satisfies foreign-functions:foreign-address-p)
+    convert-python-ff-call/arg)
+   (start :foreign-address) (stop :foreign-address)
+   (step :foreign-address))
+  :strings-convert nil :returning :int :allow-gc :always :call-direct t
+  :arg-checking nil)
+
+(foreign-functions:def-foreign-call PySlice_AdjustIndices
+  ((length Py_ssize_t) (start :foreign-address) (stop :foreign-address)
+   (step Py_ssize_t))
+  :strings-convert nil :returning Py_ssize_t :allow-gc :always
+  :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PySeqIter_New
   ((nil (* PyObject) (satisfies foreign-functions:foreign-address-p)
@@ -3049,7 +3172,8 @@
   PyOS_sighandler_t :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_CallObjectWithKeywords
-  ((func (* PyObject) (satisfies foreign-functions:foreign-address-p)
+  ((callable (* PyObject)
+    (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg)
    (args (* PyObject) (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg)
@@ -3108,14 +3232,6 @@
   ((nil (* PyObject) (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg))
   :strings-convert nil :returning ((* :char) (unsigned-byte 64))
-  :allow-gc :always :call-direct t :arg-checking nil)
-
-(foreign-functions:def-foreign-call PyEval_GetCallStats
-  ((nil (* PyObject) (satisfies foreign-functions:foreign-address-p)
-    convert-python-ff-call/arg))
-  :strings-convert nil :returning
-  ((* PyObject) (satisfies foreign-functions:foreign-address-p)
-   convert-python-ff-call/ret)
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyEval_EvalFrame
@@ -3235,6 +3351,18 @@
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   nil :arg-checking nil)
 
+(foreign-functions:def-foreign-call PyOS_BeforeFork (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyOS_AfterFork_Parent (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyOS_AfterFork_Child (:void)
+  :strings-convert nil :returning :void :allow-gc :always :call-direct
+  nil :arg-checking nil)
+
 (foreign-functions:def-foreign-call PyOS_AfterFork (:void)
   :strings-convert nil :returning :void :allow-gc :always :call-direct
   nil :arg-checking nil)
@@ -3299,6 +3427,14 @@
   ((* PyObject) (satisfies foreign-functions:foreign-address-p)
    convert-python-ff-call/ret)
   :allow-gc :always :call-direct nil :arg-checking nil)
+
+(foreign-functions:def-foreign-call PyImport_GetModule
+  ((name (* PyObject) (satisfies foreign-functions:foreign-address-p)
+    convert-python-ff-call/arg))
+  :strings-convert nil :returning
+  ((* PyObject) (satisfies foreign-functions:foreign-address-p)
+   convert-python-ff-call/ret)
+  :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyImport_AddModuleObject
   ((name (* PyObject) (satisfies foreign-functions:foreign-address-p)
@@ -3403,7 +3539,7 @@
   :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_Call
-  ((callable_object (* PyObject)
+  ((callable (* PyObject)
     (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg)
    (args (* PyObject) (satisfies foreign-functions:foreign-address-p)
@@ -3416,7 +3552,7 @@
   :allow-gc :always :call-direct t :arg-checking nil)
 
 (foreign-functions:def-foreign-call PyObject_CallObject
-  ((callable_object (* PyObject)
+  ((callable (* PyObject)
     (satisfies foreign-functions:foreign-address-p)
     convert-python-ff-call/arg)
    (args (* PyObject) (satisfies foreign-functions:foreign-address-p)

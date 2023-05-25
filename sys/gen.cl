@@ -22,6 +22,7 @@
                (t x)))
     (symbol (case x
               (size_t :unsigned-nat)
+              (int64_t :long-long)
               (t x)))
     (list (case (first x)
             (:pointer (case (second x)
@@ -32,6 +33,7 @@
                            ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
                         (:char '((* :char) #+32bit (unsigned-byte 32) #+64bit (unsigned-byte 64))) ; char*
                         (size_t '((* :unsigned-nat)))
+                        (int64_t '((* :long-long)))
                         (t :foreign-address)))
             (t (error "don't know how to translate compound type ~s" x))))))
 
