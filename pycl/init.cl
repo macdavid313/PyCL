@@ -117,7 +117,17 @@ else:
 (defun startup ()
   "This function runs after a python instance has been successfully initialized.
 It does:
-  1. initialize global pointers"
+  1. initialize basic types
+  2. initialize exception and warning pointers"
+  (setf (gethash 'Py_None  *pyglobalptr*) (get-entry-point "_Py_NoneStruct")
+        (gethash 'Py_False *pyglobalptr*) (get-entry-point "_Py_FalseStruct")
+        (gethash 'Py_True  *pyglobalptr*) (get-entry-point "_Py_TrueStruct"))
+  (dolist (name '("Type" "Long" "Float" "Complex" "Bytes" "ByteArray" "Unicode"
+                  "Tuple" "List" "Dict" "Set" "Function" "InstanceMethod" "Cell"
+                  "Code" "Module" "SeqIter" "Property" "Slice" "Gen" "Coro"
+                  "Context" "Context_Var" "ContextToken"))
+    (setf (gethash (intern #1=(string+ "Py" name "_Type")) *pyglobalptr*)
+          (get-entry-point #1#)))
   (dolist (name pycl.sys:+libpython-foreign-pointers+)
     (setf (gethash (intern name) *pyglobalptr*)
           (fslot-value-typed :unsigned-nat              ; type
@@ -143,7 +153,7 @@ It does:
                              (sys:getenv "PYTHONHOME") nil)
                        (init-python-program-name program) ; Py_SetProgramName
                        (init-python-home home)            ; Py_SetPythonHome
-                       (Py_InitializeEx 0)            ; Call 'Py_InitializeEx
+                       (Py_InitializeEx 0) ; Call 'Py_InitializeEx
                        (when (not (Py_IsInitialized))
                          (error "Python initialization failed after calling 'Py_InitializeEx"))
                        (setf *python*   ; Initialize *python*
