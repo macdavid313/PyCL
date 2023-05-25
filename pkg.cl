@@ -1,8 +1,6 @@
 ;;;; pkg.cl
 (in-package #:cl-user)
 
-#-asdf (require :asdf)
-
 (use-package 'util.string)
 
 (eval-when (:load-toplevel :execute)
@@ -27,11 +25,13 @@
 
 (defun compile-and-load-pycl ()
   (dolist (file *pycl-src-files*)
-    (load
-     (compile-file-if-needed (string+ file ".cl")
-                             :load-after-compile nil))))
+    (load (compile-file-if-needed (string+ file ".cl")
+                                  :load-after-compile nil))))
 
 (defun build-pycl ()
   (compile-and-load-pycl)
-  (uiop:concatenate-files (mapcar (lambda (f) (string+ f ".fasl")) *pycl-src-files*)
-                          *pycl-fasl-output*))
+  (with-open-file (out *pycl-fasl-output* :direction :output
+                                          :if-exists :supersede
+                                          :if-does-not-exist :create)
+    (dolist (file *pycl-src-files*)
+      (sys:copy-file (string+ file ".fasl") out))))
