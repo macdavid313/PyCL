@@ -91,3 +91,6 @@
 ;;                      :c                          ; allocation
 ;;                      (foreign-pointer-address o) ; fp
 ;;                      'pycl.sys::ob_type)) ; fslot
+
+;;; Exceptions
+;;; see also conditions.cl
