@@ -11,8 +11,8 @@
                    "sys/conversion"
                    "sys/capi"
                    "pycl/package"
-                   "pycl/init"
                    "pycl/conditions"
+                   "pycl/init"
                    "pycl/pyobject"
                    ;; files list ends here
                    )))

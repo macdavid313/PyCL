@@ -2,7 +2,8 @@
 (in-package #:pycl)
 
 (define-condition pycl-condition (condition)
-  ())
+  ()
+  (:report report-pycl-condition))
 
 (defgeneric report-pycl-condition (c stream)
   (:documentation "Report pycl and python related condition"))
@@ -11,8 +12,7 @@
   ((msg :initarg :msg :accessor python-error-msg :type simple-string)
    (type :initarg :type :reader python-error-type :type foreign-pointer)
    (val :initarg :val :reader python-error-val :type foreign-pointer)
-   (traceback :initarg :traceback :reader python-error-traceback :type foreign-pointer))
-  (:report report-pycl-condition))
+   (traceback :initarg :traceback :reader python-error-traceback :type foreign-pointer)))
 
 (defun make-python-error (msg &optional e)
   (declare (type (or nil python-error) e)
@@ -44,15 +44,14 @@
 ;;         ;; TODO: need pycall implementation?
 ;;         ))))
 
-(define-condition pycl-error (pycl-condition error)
-  (err)
-  (:report report-pycl-condition))
+;; (define-condition pycl-error (pycl-condition error)
+;;   (err)
+;;   (:report report-pycl-condition))
 
-(defmethod report-pycl-condition ((err pycl-error) stream)
-  (print-unreadable-object (err stream :type t :identity nil)
-    (write-string (string+ "(in a Lisp function called from Python)"
-                           #\Newline
-                           "Lisp: "
-                           ;; TODO
-                           ))))
-
+;; (defmethod report-pycl-condition ((err pycl-error) stream)
+;;   (print-unreadable-object (err stream :type t :identity nil)
+;;     (write-string (string+ "(in a Lisp function called from Python)"
+;;                            #\Newline
+;;                            "Lisp: "
+;;                            ;; TODO
+;;                            ))))

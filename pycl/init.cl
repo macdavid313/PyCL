@@ -1,27 +1,27 @@
 ;;;; init.cl
 (in-package #:pycl)
 
+(define-condition start-python-error (pycl-condition error)
+  ((reason :initarg :reason :initform "" :type simple-string)))
+
+(defmethod report-pycl-condition ((err start-python-error) stream)
+  (format stream "start-python FAILED!~%~a" (slot-value err 'reason)))
+
+(defconstant +minimum-python-version+ "3.7")
+
 (defvar-nonbindable *python* nil
   "A python interpreter instance.")
 
-(defvar-nonbindable *pyglobalptr*
-    (make-hash-table :test 'eq :size (length pycl.sys:+libpython-foreign-pointers+))
-  "A hash table where key is the global pointer's name and the value is its foreign address")
-
-(defun pyglobalptr (k)
-  (multiple-value-bind (v exists-p)
-      (gethash k *pyglobalptr*)
-    (if* exists-p
-       then v
-       else (error "Global pointer ~s has not been initialized!"))))
-
-(defconstant +minimum-python-version+ "3.7")
+(defvar-nonbindable *python-global-pointers* nil
+  "A list of symbols that can be used to reference valid (non-null) global
+pointers processed from +libpython-extern-variables+. It is probably only useful
+for diagnostic purposes.")
 
 (eval-when (:load-toplevel)
   (defparameter *find_libpython.py*
     (let ((path (string+ (directory-namestring *load-pathname*) "find_libpython.py")))
       (when (not (probe-file path))
-        (error "Missing file \"find_libpython.py\""))
+        (error 'start-python-error :reason "Missing file \"find_libpython.py\""))
       path)))
 
 (defun ensure-libpython-loaded (python-exe)
@@ -33,18 +33,23 @@ error."
   (multiple-value-bind (candidates stderr exit)
       (excl.osi:command-output (string+ python-exe #\Space *find_libpython.py* #\Space "--list-all"))
     (when (not (zerop exit))
-      (error "Cannot find libpython shared object by executing find_libpython.py:~%~a" (apply 'string+ stderr)))
+      (error 'start-python-error
+             :reason (string+ "Cannot find libpython shared object by executing find_libpython.py:"
+                              #\Newline
+                              (apply 'string+ stderr))))
     (dolist (lib candidates)
       (when (ignore-errors (load lib :foreign t))
         (return-from ensure-libpython-loaded lib)))
-    (error "Cannot load libpython shared object from these: ~a" candidates)))
+    (error 'start-python-error
+           :reason (string+ "Cannot load libpython shared object from these: " candidates))))
 
 (defun find-python-program (python-exe)
   (let ((script "import sys; print(sys.executable)"))
     (multiple-value-bind (program stderr exit)
         (excl.osi:command-output (string+ python-exe #\Space "-c" #\Space #\" script #\"))
       (when (not (zerop exit))
-        (error "Cannot get the python program name by running ~s:~%~a" script stderr))
+        (error 'start-python-error
+               :reason (format nil "Cannot get the python program name by running ~s:~%~a" script stderr)))
       (first program))))
 
 (defun find-python-home (python-exe)
@@ -69,7 +74,8 @@ else:
     (multiple-value-bind (home stderr exit)
         (excl.osi:command-output (string+ python-exe #\Space "-c" #\Space #\" script #\"))
       (when (not (zerop exit))
-        (error "Cannot get the python home by running ~s:~%~a" script stderr))
+        (error 'start-python
+               :reason (format nil "Cannot get the python home by running ~s:~%~a" script stderr)))
       (first home))))
 
 (defun get-python-version (python-exe)
@@ -77,7 +83,17 @@ else:
       (excl.osi:command-output (string+ python-exe #\Space "--version"))
     (when (not (zerop exit))
       (error "Cannot get the python version by running \"~a --version\":~%~a" python-exe stderr))
-    (second (split-re " " (first version)))))
+    (let ((version (second (split-re " " (first version)))))
+      (destructuring-bind (major minor &rest others)
+          (split-re "\\." version)
+        (declare (ignore others))
+        (setq major (parse-integer major)
+              minor (parse-integer minor))
+        (cond ((= major 2) (error 'start-python-error :reason "Python 2 is not supported"))
+              ((<= minor 6) (error 'start-python-error
+                                   :reason (format nil "Minimum python version: ~s, but got ~s from ~s"
+                                                   +minimum-python-version+ version python-exe)))
+              (t version))))))
 
 (defstruct python
   (libpython     "" :type simple-string)
@@ -102,73 +118,77 @@ else:
       (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
         (setq w (Py_DecodeLocale program* size*))
         (when (zerop w)
-          (error "Error from calling Py_DecodeLocale on arg: ~a" program*))
+          (error 'start-python-error :reason "In init-python-program-name, error raise from calling Py_DecodeLocale"))
         (Py_SetProgramName w)))))
 
-(defun init-python-home (home)
-  (with-native-string (home* home)
-    (let (w)
-      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
-        (setq w (Py_DecodeLocale home* size*))
-        (when (zerop w)
-          (error "Error from calling Py_DecodeLocale on arg: ~a" home*))
-        (Py_SetPythonHome w)))))
+(defun defglobalptr-helper (name &key pointer-p)
+  (let ((address (get-entry-point name))) ; entry address
+    (when pointer-p     ; deref if tagged with :pointer e.g. (:pointer PyObject)
+      (setq address (fslot-value-typed :unsigned-nat :c address)))
+    (funcall
+     `(lambda ()
+        (defconstant ,(intern name) ,address)))))
 
 (defun startup ()
-  "This function runs after a python instance has been successfully initialized.
-It does:
-  1. initialize basic types
-  2. initialize exception and warning pointers"
-  (setf (gethash 'Py_None  *pyglobalptr*) (get-entry-point "_Py_NoneStruct")
-        (gethash 'Py_False *pyglobalptr*) (get-entry-point "_Py_FalseStruct")
-        (gethash 'Py_True  *pyglobalptr*) (get-entry-point "_Py_TrueStruct"))
-  (dolist (name '("Type" "Long" "Float" "Complex" "Bytes" "ByteArray" "Unicode"
-                  "Tuple" "List" "Dict" "Set" "Function" "InstanceMethod" "Cell"
-                  "Code" "Module" "SeqIter" "Property" "Slice" "Gen" "Coro"
-                  "Context" "Context_Var" "ContextToken"))
-    (setf (gethash (intern #1=(string+ "Py" name "_Type")) *pyglobalptr*)
-          (get-entry-point #1#)))
-  (dolist (name pycl.sys:+libpython-foreign-pointers+)
-    (setf (gethash (intern name) *pyglobalptr*)
-          (fslot-value-typed :unsigned-nat              ; type
-                             :c                         ; allocation
-                             (get-entry-point name))))) ; address
+  "This function runs after a python instance has been successfully initialized."
+  ;; step 1: define PyGILState_Check if available
+  (when (and (not (fboundp 'PyGILState_Check))
+             (get-entry-point "PyGILState_Check"))
+    (def-foreign-call PyGILState_Check (:void)
+      :returning :boolean
+      :arg-checking nil
+      :call-direct t
+      :allow-gc :always))
+  ;; step2: initialize global pointers
+  (dolist (spec +libpython-extern-variables+)
+    (when (get-entry-point (first spec)) ; validate extern variable
+      (apply 'defglobalptr-helper spec)
+      (push (intern (first spec)) *python-global-pointers*)))
+  ;; step 3: initialize Py_None, Py_False, and Py_True
+  ;; they need to be defined separately because they are aliased
+  (defconstant Py_None  (symbol-value '_Py_NoneStruct))
+  (defconstant Py_False (symbol-value '_Py_FalseStruct))
+  (defconstant Py_True  (symbol-value '_Py_TrueStruct))
+  ;; end of startup
+  t)
 
-(defun start-python (&optional (python-exe #+windows "python.exe"
-                                           #-windows "python"))
-  (if* *python*
-     then (error "*python* is non-nil: ~a" *python*)
-     else (let ((version (get-python-version python-exe))
-                libpython
-                program
-                home)
-            (when (string< version +minimum-python-version+)
-              (error "Minimum python version: ~s, but got ~s from ~s"
-                     +minimum-python-version+ version python-exe))
-            (setq libpython (ensure-libpython-loaded python-exe))
-            (handler-case
-                (progn (setq program (find-python-program python-exe)
-                             home (find-python-home python-exe))
-                       (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
-                             (sys:getenv "PYTHONHOME") nil)
-                       (init-python-program-name program) ; Py_SetProgramName
-                       (init-python-home home)            ; Py_SetPythonHome
-                       (Py_InitializeEx 0) ; Call 'Py_InitializeEx
-                       (when (not (Py_IsInitialized))
-                         (error "Python initialization failed after calling 'Py_InitializeEx"))
-                       (setf *python*   ; Initialize *python*
-                             (make-python :libpython libpython
-                                          :exe python-exe
-                                          :program program
-                                          :home home
-                                          :version version))
-                       *python*)
-              (error () (unload-foreign-library libpython)))
-            ;; run startup operations
-            (startup)
-            *python*)))
+(defun %start-python (python-exe)
+  (when *python*                        ; already initialized
+    (error 'start-python-error :reason "*python* is non-nil. Is Python already started?"))
+  (let ((version (get-python-version python-exe))
+        (libpython (ensure-libpython-loaded python-exe))
+        (program (find-python-program python-exe))
+        (home (find-python-home python-exe)))
+    (setf *python*                      ; Initialize *python*
+          (make-python :libpython libpython
+                       :exe python-exe
+                       :program program
+                       :home home
+                       :version version))
+    (handler-case
+        (with-slots (home program) *python*
+          (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
+                (sys:getenv "PYTHONHOME") home)
+          (init-python-program-name program) ; Py_SetProgramName
+          (Py_InitializeEx 0)                ; Call 'Py_InitializeEx
+          (startup))
+      (error (err)
+        (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
+        (shutdown-python :unload-libpython t)
+        (error 'start-python-error :reason (string+ err)))))
+  *python*)
 
-(defun shutdown-python ()
-  (Py_FinalizeEx)
-  (unload-foreign-library (python-libpython *python*))
-  (setf *python* nil))
+(defun start-python (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
+                                               #+windows "python.exe"
+                                               #-windows "python")))
+  (check-type python-exe simple-string)
+  (when (not (probe-file python-exe))
+    (error 'start-python-error :reason (format nil "python-exe is not valid: ~s" python-exe)))
+  (%start-python python-exe))
+
+(defun shutdown-python (&key (unload-libpython t))
+  (when *python*
+    (ignore-errors (Py_FinalizeEx))     ; TODO: handle error value -1?
+    (when (and unload-libpython (python-libpython *python*))
+      (unload-foreign-library (python-libpython *python*)))
+    (setf *python* nil)))
