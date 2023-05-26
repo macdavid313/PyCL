@@ -10,4 +10,4 @@
            #:+PY_LOCK_INTR+
            #:+PyGILState_LOCKED+
            #:+PyGILState_UNLOCKED+
-           #:+libpython-foreign-pointers+))
+           #:+libpython-extern-variables+))

@@ -3,15 +3,15 @@
 
 (use-package :util.string)
 
-(defun collect-global-pointers ()
+(defun collect-extern-variables ()
   (let (collected)
     (dolist (form *manifest-forms*)
       (when (eq 'extern (car form))
         (destructuring-bind (_ sym ftype) form
-          (when (and (match-re "^Py" (symbol-name sym) :case-fold nil)
-                     (listp ftype)
-                     (eq (car ftype) :pointer))
-            (push (symbol-name sym) collected)))))
+          (when (match-re "^_?Py" (symbol-name sym) :case-fold nil)
+            (push (list (symbol-name sym)
+                        :pointer-p (if (and (consp ftype) (eq :pointer (first ftype))) t nil))
+                  collected)))))
     collected))
 
 (defun translate-foreign-type (x &key ret)
@@ -72,11 +72,12 @@
                   (eval-when (:compile-toplevel)
                     (declaim (optimize speed (safety 0) (space 0))))))
     (write-form form))
-  ;; foreign pointers
-  ;; they should only be initialized after libpython has been loaded
-  ;; as in (def-foreign-variable ...) or (def-foreign-constant ...)
-  (write-form `(defconstant +libpython-foreign-pointers+
-                 (list ,@(collect-global-pointers))))
+  ;; extern variables
+  ;; example input:   (extern PyExc_SystemExit (:pointer PyObject))
+  ;; expected output: ("PyExc_SystemExit" :pointer-p t)
+  ;; they shall be processed after libpython has been loaded
+  (write-form `(defconstant +libpython-extern-variables+
+                 ',(collect-extern-variables)))
   ;; foreign functions
   (dolist (form *manifest-forms*)
     (write-form

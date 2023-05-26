@@ -6,36 +6,134 @@
 (eval-when (:compile-toplevel)
   (declaim (optimize speed (safety 0) (space 0))))
 
-(defconstant +libpython-foreign-pointers+
-    (list "PyExc_ResourceWarning" "PyExc_BytesWarning"
-     "PyExc_UnicodeWarning" "PyExc_ImportWarning" "PyExc_FutureWarning"
-     "PyExc_RuntimeWarning" "PyExc_SyntaxWarning"
-     "PyExc_PendingDeprecationWarning" "PyExc_DeprecationWarning"
-     "PyExc_UserWarning" "PyExc_Warning" "PyExc_IOError"
-     "PyExc_EnvironmentError" "PyExc_TimeoutError"
-     "PyExc_ProcessLookupError" "PyExc_PermissionError"
-     "PyExc_NotADirectoryError" "PyExc_IsADirectoryError"
-     "PyExc_InterruptedError" "PyExc_FileNotFoundError"
-     "PyExc_FileExistsError" "PyExc_ConnectionResetError"
-     "PyExc_ConnectionRefusedError" "PyExc_ConnectionAbortedError"
-     "PyExc_ConnectionError" "PyExc_ChildProcessError"
-     "PyExc_BrokenPipeError" "PyExc_BlockingIOError"
-     "PyExc_ZeroDivisionError" "PyExc_ValueError"
-     "PyExc_UnicodeTranslateError" "PyExc_UnicodeDecodeError"
-     "PyExc_UnicodeEncodeError" "PyExc_UnicodeError"
-     "PyExc_UnboundLocalError" "PyExc_TypeError" "PyExc_SystemExit"
-     "PyExc_SystemError" "PyExc_ReferenceError" "PyExc_TabError"
-     "PyExc_IndentationError" "PyExc_SyntaxError"
-     "PyExc_NotImplementedError" "PyExc_RecursionError"
-     "PyExc_RuntimeError" "PyExc_OverflowError" "PyExc_NameError"
-     "PyExc_MemoryError" "PyExc_KeyboardInterrupt" "PyExc_KeyError"
-     "PyExc_IndexError" "PyExc_ModuleNotFoundError" "PyExc_ImportError"
-     "PyExc_OSError" "PyExc_FloatingPointError" "PyExc_EOFError"
-     "PyExc_BufferError" "PyExc_AttributeError" "PyExc_AssertionError"
-     "PyExc_LookupError" "PyExc_ArithmeticError" "PyExc_GeneratorExit"
-     "PyExc_StopIteration" "PyExc_StopAsyncIteration" "PyExc_Exception"
-     "PyExc_BaseException" "PyStructSequence_UnnamedField"
-     "Py_FileSystemDefaultEncodeErrors" "Py_FileSystemDefaultEncoding"))
+(defconstant +libpython-extern-variables+
+    (quote
+     (("PyZip_Type" :pointer-p nil) ("PyMap_Type" :pointer-p nil)
+      ("PyFilter_Type" :pointer-p nil)
+      ("PyNullImporter_Type" :pointer-p nil)
+      ("_Py_CheckRecursionLimit" :pointer-p nil)
+      ("PyOS_ReadlineFunctionPointer" :pointer-p nil)
+      ("PyOS_InputHook" :pointer-p nil)
+      ("PyExc_ResourceWarning" :pointer-p t)
+      ("PyExc_BytesWarning" :pointer-p t)
+      ("PyExc_UnicodeWarning" :pointer-p t)
+      ("PyExc_ImportWarning" :pointer-p t)
+      ("PyExc_FutureWarning" :pointer-p t)
+      ("PyExc_RuntimeWarning" :pointer-p t)
+      ("PyExc_SyntaxWarning" :pointer-p t)
+      ("PyExc_PendingDeprecationWarning" :pointer-p t)
+      ("PyExc_DeprecationWarning" :pointer-p t)
+      ("PyExc_UserWarning" :pointer-p t) ("PyExc_Warning" :pointer-p t)
+      ("PyExc_IOError" :pointer-p t)
+      ("PyExc_EnvironmentError" :pointer-p t)
+      ("PyExc_TimeoutError" :pointer-p t)
+      ("PyExc_ProcessLookupError" :pointer-p t)
+      ("PyExc_PermissionError" :pointer-p t)
+      ("PyExc_NotADirectoryError" :pointer-p t)
+      ("PyExc_IsADirectoryError" :pointer-p t)
+      ("PyExc_InterruptedError" :pointer-p t)
+      ("PyExc_FileNotFoundError" :pointer-p t)
+      ("PyExc_FileExistsError" :pointer-p t)
+      ("PyExc_ConnectionResetError" :pointer-p t)
+      ("PyExc_ConnectionRefusedError" :pointer-p t)
+      ("PyExc_ConnectionAbortedError" :pointer-p t)
+      ("PyExc_ConnectionError" :pointer-p t)
+      ("PyExc_ChildProcessError" :pointer-p t)
+      ("PyExc_BrokenPipeError" :pointer-p t)
+      ("PyExc_BlockingIOError" :pointer-p t)
+      ("PyExc_ZeroDivisionError" :pointer-p t)
+      ("PyExc_ValueError" :pointer-p t)
+      ("PyExc_UnicodeTranslateError" :pointer-p t)
+      ("PyExc_UnicodeDecodeError" :pointer-p t)
+      ("PyExc_UnicodeEncodeError" :pointer-p t)
+      ("PyExc_UnicodeError" :pointer-p t)
+      ("PyExc_UnboundLocalError" :pointer-p t)
+      ("PyExc_TypeError" :pointer-p t)
+      ("PyExc_SystemExit" :pointer-p t)
+      ("PyExc_SystemError" :pointer-p t)
+      ("PyExc_ReferenceError" :pointer-p t)
+      ("PyExc_TabError" :pointer-p t)
+      ("PyExc_IndentationError" :pointer-p t)
+      ("PyExc_SyntaxError" :pointer-p t)
+      ("PyExc_NotImplementedError" :pointer-p t)
+      ("PyExc_RecursionError" :pointer-p t)
+      ("PyExc_RuntimeError" :pointer-p t)
+      ("PyExc_OverflowError" :pointer-p t)
+      ("PyExc_NameError" :pointer-p t)
+      ("PyExc_MemoryError" :pointer-p t)
+      ("PyExc_KeyboardInterrupt" :pointer-p t)
+      ("PyExc_KeyError" :pointer-p t) ("PyExc_IndexError" :pointer-p t)
+      ("PyExc_ModuleNotFoundError" :pointer-p t)
+      ("PyExc_ImportError" :pointer-p t) ("PyExc_OSError" :pointer-p t)
+      ("PyExc_FloatingPointError" :pointer-p t)
+      ("PyExc_EOFError" :pointer-p t)
+      ("PyExc_BufferError" :pointer-p t)
+      ("PyExc_AttributeError" :pointer-p t)
+      ("PyExc_AssertionError" :pointer-p t)
+      ("PyExc_LookupError" :pointer-p t)
+      ("PyExc_ArithmeticError" :pointer-p t)
+      ("PyExc_GeneratorExit" :pointer-p t)
+      ("PyExc_StopIteration" :pointer-p t)
+      ("PyExc_StopAsyncIteration" :pointer-p t)
+      ("PyExc_Exception" :pointer-p t)
+      ("PyExc_BaseException" :pointer-p t)
+      ("PyStructSequence_UnnamedField" :pointer-p t)
+      ("_PyWeakref_CallableProxyType" :pointer-p nil)
+      ("_PyWeakref_ProxyType" :pointer-p nil)
+      ("_PyWeakref_RefType" :pointer-p nil)
+      ("PyProperty_Type" :pointer-p nil)
+      ("PyDictProxy_Type" :pointer-p nil)
+      ("PyWrapperDescr_Type" :pointer-p nil)
+      ("PyMethodDescr_Type" :pointer-p nil)
+      ("PyMemberDescr_Type" :pointer-p nil)
+      ("PyGetSetDescr_Type" :pointer-p nil)
+      ("PyClassMethodDescr_Type" :pointer-p nil)
+      ("PyCmpWrapper_Type" :pointer-p nil)
+      ("PyCallIter_Type" :pointer-p nil)
+      ("PySeqIter_Type" :pointer-p nil)
+      ("PyEllipsis_Type" :pointer-p nil)
+      ("PySlice_Type" :pointer-p nil)
+      ("_Py_EllipsisObject" :pointer-p nil)
+      ("PyTraceBack_Type" :pointer-p nil)
+      ("PyCapsule_Type" :pointer-p nil) ("Py_UTF8Mode" :pointer-p nil)
+      ("Py_HasFileSystemDefaultEncoding" :pointer-p nil)
+      ("Py_FileSystemDefaultEncodeErrors" :pointer-p t)
+      ("Py_FileSystemDefaultEncoding" :pointer-p t)
+      ("PyModuleDef_Type" :pointer-p nil)
+      ("PyModule_Type" :pointer-p nil)
+      ("PyCFunction_Type" :pointer-p nil)
+      ("PySetIter_Type" :pointer-p nil)
+      ("PyFrozenSet_Type" :pointer-p nil) ("PySet_Type" :pointer-p nil)
+      ("PyReversed_Type" :pointer-p nil) ("PyEnum_Type" :pointer-p nil)
+      ("PyDictValues_Type" :pointer-p nil)
+      ("PyDictItems_Type" :pointer-p nil)
+      ("PyDictKeys_Type" :pointer-p nil)
+      ("PyDictIterItem_Type" :pointer-p nil)
+      ("PyDictIterValue_Type" :pointer-p nil)
+      ("PyDictIterKey_Type" :pointer-p nil)
+      ("PyDict_Type" :pointer-p nil)
+      ("PySortWrapper_Type" :pointer-p nil)
+      ("PyListRevIter_Type" :pointer-p nil)
+      ("PyListIter_Type" :pointer-p nil) ("PyList_Type" :pointer-p nil)
+      ("PyTupleIter_Type" :pointer-p nil)
+      ("PyTuple_Type" :pointer-p nil)
+      ("PyMemoryView_Type" :pointer-p nil)
+      ("PyLongRangeIter_Type" :pointer-p nil)
+      ("PyRangeIter_Type" :pointer-p nil)
+      ("PyRange_Type" :pointer-p nil) ("PyComplex_Type" :pointer-p nil)
+      ("PyFloat_Type" :pointer-p nil) ("_Py_TrueStruct" :pointer-p nil)
+      ("_Py_FalseStruct" :pointer-p nil) ("PyBool_Type" :pointer-p nil)
+      ("PyLong_Type" :pointer-p nil)
+      ("PyUnicodeIter_Type" :pointer-p nil)
+      ("PyUnicode_Type" :pointer-p nil)
+      ("PyBytesIter_Type" :pointer-p nil)
+      ("PyBytes_Type" :pointer-p nil)
+      ("PyByteArrayIter_Type" :pointer-p nil)
+      ("PyByteArray_Type" :pointer-p nil)
+      ("_Py_NotImplementedStruct" :pointer-p nil)
+      ("_Py_NoneStruct" :pointer-p nil) ("PySuper_Type" :pointer-p nil)
+      ("PyBaseObject_Type" :pointer-p nil)
+      ("PyType_Type" :pointer-p nil))))
 
 (foreign-functions:def-foreign-call PyMem_Malloc ((size :unsigned-nat))
   :strings-convert nil :returning :foreign-address :allow-gc :always
