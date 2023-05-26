@@ -13,7 +13,7 @@
                    "pycl/package"
                    "pycl/conditions"
                    "pycl/init"
-                   "pycl/pyobject"
+                   "pycl/pycl"
                    ;; files list ends here
                    )))
       (mapcar (lambda (file)

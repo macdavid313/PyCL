@@ -1,35 +1,5 @@
-;;;; pyobject.cl
+;;;; pycl.cl
 (in-package #:pycl)
-
-(defun pyobject-p (thing)
-  (and (foreign-pointer-p thing)
-       (eq 'PyObject (foreign-pointer-type thing))))
-
-(deftype pyobject ()
-  '(satisfies pyobject-p))
-
-;; (declaim (ftype (function (t) pyobject) to-pyobject))
-;; (defgeneric to-pyobject (thing)
-;;   (:documentation "Convert a lisp value to a PyObject foreign pointer."))
-
-;; (defgeneric from-pyobject (pyobj output-type-spec)
-;;   (:documentation "Convert a PyObject foreign pointer to a value by the given lisp type specifier."))
-
-(defun pyobject-eq (x y)
-  (check-type x pyobject)
-  (check-type y pyobject)
-  (= (foreign-pointer-address x)
-     (foreign-pointer-address y)))
-
-(defun pynull (ob)
-  (check-type ob pyobject)
-  (zerop (foreign-pointer-address ob)))
-
-(defun pystealref (ob)
-  (declare (type pyobject ob))
-  (let ((original-fp (foreign-pointer-address ob)))
-    (setf (foreign-pointer-address ob) 0)
-    original-fp))
 
 ;;; lifetime management --------
 ;;; GIL, GC, and weak references
@@ -57,6 +27,36 @@
 
 ;; (defvar *lifetime-policy* :default ; (:new :borrow :steal :deferred)
 ;;   "A special variable that represents different policies for lifetime management")
+
+;; (defun pyobject-p (thing)
+;;   (and (foreign-pointer-p thing)
+;;        (eq 'PyObject (foreign-pointer-type thing))))
+
+;; (deftype pyobject ()
+;;   '(satisfies pyobject-p))
+
+;; (declaim (ftype (function (t) pyobject) to-pyobject))
+;; (defgeneric to-pyobject (thing)
+;;   (:documentation "Convert a lisp value to a PyObject foreign pointer."))
+
+;; (defgeneric from-pyobject (pyobj output-type-spec)
+;;   (:documentation "Convert a PyObject foreign pointer to a value by the given lisp type specifier."))
+
+;; (defun pyobject-eq (x y)
+;;   (check-type x pyobject)
+;;   (check-type y pyobject)
+;;   (= (foreign-pointer-address x)
+;;      (foreign-pointer-address y)))
+
+;; (defun pynull (ob)
+;;   (check-type ob pyobject)
+;;   (zerop (foreign-pointer-address ob)))
+
+;; (defun pystealref (ob)
+;;   (declare (type pyobject ob))
+;;   (let ((original-fp (foreign-pointer-address ob)))
+;;     (setf (foreign-pointer-address ob) 0)
+;;     original-fp))
 
 ;; (defun pyincref (o)
 ;;   (check-type o pyobject)
