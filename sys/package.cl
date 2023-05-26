@@ -10,4 +10,6 @@
            #:+PY_LOCK_INTR+
            #:+PyGILState_LOCKED+
            #:+PyGILState_UNLOCKED+
-           #:+libpython-extern-variables+))
+           #:+libpython-extern-variables+
+           #:pyptr
+           #:with-python-gil))

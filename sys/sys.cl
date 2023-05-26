@@ -1,4 +1,4 @@
-;;;; types.cl
+;;;; sys.cl
 (in-package #:pycl.sys)
 
 (def-foreign-type Py_ssize_t :nat)
@@ -101,3 +101,50 @@
      (itemsize :int)
      (flags :unsigned-int)
      (slots (* PyType_Slot))))
+
+(defclass pyptr (foreign-pointer)
+  ())
+
+(defmethod print-object ((p pyptr) stream)
+  (let ((*print-base* 16))
+    (format stream "#<~a @ #x~a>"
+            (foreign-pointer-type p)
+            (foreign-pointer-address p))))
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun foreign-python-funcall-returning-converter (action fp ctype ltype)
+    "Convert a foriegn address to a foreign pointer."
+    (declare (ignore ltype)
+             (type (unsigned-byte #+32bit 32 #+64bit 64) fp)
+             (optimize (speed 3) (safety 0) (space 0)))
+    (case action
+      (:convert (make-instance 'pyptr :foreign-address fp
+                                      :foreign-type (if (listp ctype) (second ctype) ctype)))
+      (:convert-type 'integer)
+      (:identify :return)
+      (:allocate nil)
+      (:will-allocate nil))))
+
+;;; lifetime management --------
+;;; GIL, GC, and weak references
+;;;
+#-os-threads
+(defmacro with-python-gil ((&key safe) &body body)
+  (declare (ignore safe))
+  `(progn ,@body))
+
+#+os-threads
+(defmacro with-python-gil ((&key (safe t)) &body body)
+  (let ((g (gensym "g"))
+        (res (gensym "res")))
+    (if* safe
+       then `(let ((,g (PyGILState_Ensure))
+                   ,res)
+               (declare (type (mod 1) ,g)
+                        (dynamic-extent ,g))
+               (setq ,res (progn ,@body))
+               (PyGILState_Release ,g)
+               ,res)
+       else `(let ((,g (PyGILState_Ensure)))
+               (unwind-protect (progn ,@body)
+                 (PyGILState_Release))))))

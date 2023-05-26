@@ -28,9 +28,9 @@
             (:pointer (case (second x)
                         ;; see https://peps.python.org/pep-0384/#structures
                         ((PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef PyModuleDefBase PyModuleDef PyStructSequence_Field PyStructSequence_Desc PyType_Slot PyType_Spec)
-                         `((* ,(second x))                  ; foreign type
-                           (satisfies ff:foreign-address-p) ; lisp type
-                           ,(if ret 'convert-python-ff-call/ret 'convert-python-ff-call/arg))) ; conversion
+                         (if* ret
+                            then `((* ,(second x)) t foreign-python-funcall-returning-converter)
+                            else `((* ,(second x)))))
                         (:char '((* :char) #+32bit (unsigned-byte 32) #+64bit (unsigned-byte 64))) ; char*
                         (size_t '((* :unsigned-nat)))
                         (int64_t '((* :long-long)))

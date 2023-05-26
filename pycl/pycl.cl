@@ -1,29 +1,23 @@
 ;;;; pycl.cl
 (in-package #:pycl)
 
-;;; lifetime management --------
-;;; GIL, GC, and weak references
-;;;
-#-os-threads
-(defmacro with-python-gil ((&key safe) &body body)
-  (declare (ignore safe))
-  `(progn ,@body))
+(defgeneric to-pyobject (thing)
+  (:documentation "Convert a lisp value to a PyObject foreign pointer."))
 
-#+os-threads
-(defmacro with-python-gil ((&key (safe t)) &body body)
-  (let ((g (gensym "g"))
-        (res (gensym "res")))
-    (if* safe
-       then `(let ((,g (PyGILState_Ensure))
-                   ,res)
-               (declare (type (mod 1) ,g)
-                        (dynamic-extent ,g))
-               (setq ,res (progn ,@body))
-               (PyGILState_Release ,g)
-               ,res)
-       else `(let ((,g (PyGILState_Ensure)))
-               (unwind-protect (progn ,@body)
-                 (PyGILState_Release))))))
+(defmethod to-pyobject ((x number))
+  (etypecase x
+    (unsigned-byte
+     (PyLong_FromUnsignedLongLong x))
+    (integer
+     (PyLong_FromLongLong x))
+    ((or float ratio)
+     (PyFloat_FromDouble (float x 0d0)))
+    (complex
+     (PyComplex_FromDoubles (float (realpart x) 0d0)
+                            (float (imagpart x) 0d0)))))
+
+(defgeneric from-pyobject (pyobj output-type-spec)
+  (:documentation "Convert a PyObject foreign pointer to a value by the given lisp type specifier."))
 
 (defun pycheckv (res checker place)
   (cond ((funcall checker res)
@@ -58,24 +52,6 @@
         (place (if place place (car form))))
     `(let ((,res ,form))
        (pycheckv ,res #.(complement 'minusp) ',place))))
-
-(defgeneric to-pyobject (thing)
-  (:documentation "Convert a lisp value to a PyObject foreign pointer."))
-
-(defmethod to-pyobject ((x number))
-  (etypecase x
-    (unsigned-byte
-     (PyLong_FromUnsignedLongLong x))
-    (integer
-     (PyLong_FromLongLong x))
-    ((or float ratio)
-     (PyFloat_FromDouble (float x 0d0)))
-    (complex
-     (PyComplex_FromDoubles (float (realpart x) 0d0)
-                            (float (imagpart x) 0d0)))))
-
-(defgeneric from-pyobject (pyobj output-type-spec)
-  (:documentation "Convert a PyObject foreign pointer to a value by the given lisp type specifier."))
 
 (defun pynull (ob)
   (etypecase ob
