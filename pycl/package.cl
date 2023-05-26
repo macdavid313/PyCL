@@ -17,8 +17,8 @@
    #:python-program
    #:python-home
    #:python-version
-   #:start-python
-   #:shutdown-python
+   #:pystart
+   #:pystop
    ;; conditions
    #:pycl-condition
    #:python-error

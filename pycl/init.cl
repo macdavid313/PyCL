@@ -174,11 +174,11 @@ else:
           (startup))
       (error (err)
         (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
-        (shutdown-python :unload-libpython t)
+        (pystop :unload-libpython t)
         (error 'start-python-error :reason (string+ err)))))
   *python*)
 
-(defun start-python (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
+(defun pystart (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
                                                #+windows "python.exe"
                                                #-windows "python")))
   (check-type python-exe simple-string)
@@ -186,7 +186,7 @@ else:
     (error 'start-python-error :reason (format nil "python-exe is not valid: ~s" python-exe)))
   (%start-python python-exe))
 
-(defun shutdown-python (&key (unload-libpython t))
+(defun pystop (&key (unload-libpython t))
   (when *python*
     (ignore-errors (Py_FinalizeEx))     ; TODO: handle error value -1?
     (when (and unload-libpython (python-libpython *python*))
