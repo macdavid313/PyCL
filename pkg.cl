@@ -5,10 +5,12 @@
 
 (eval-when (:load-toplevel :execute)
   (defparameter *pycl-src-files*
-    (let ((files '(;; start of files list
+    (let ((files '(;; start of sys module
                    "sys/package"
-                   "sys/sys"
+                   "sys/prelude"
                    "sys/capi"
+                   "sys/sys"
+                   ;; start of pycl module
                    "pycl/package"
                    "pycl/conditions"
                    "pycl/init"
