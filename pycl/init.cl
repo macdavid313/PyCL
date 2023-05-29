@@ -5,7 +5,7 @@
   ((reason :initarg :reason :initform "" :type simple-string)))
 
 (defmethod report-pycl-condition ((err start-python-error) stream)
-  (format stream "start-python FAILED!~%~a" (slot-value err 'reason)))
+  (format stream "Start Python FAILED!~%~a" (slot-value err 'reason)))
 
 (defconstant +minimum-python-version+ "3.7")
 
