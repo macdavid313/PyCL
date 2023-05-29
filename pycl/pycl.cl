@@ -23,22 +23,17 @@
   (cond ((funcall checker res)
          res)
         ((not (pynull (PyErr_Occurred)))
-         (with-stack-fobjects ((type* #1='(* PyObject))
-                               (value* #1#)
-                               (traceback* #1#))
-           (PyErr_Fetch type* value* traceback*)
-           (PyErr_NormalizeException type* value* traceback*)
-           (let ((type (make-foreign-pointer :foreign-address (fslot-value-typed #1# :foreign type*)
-                                             :foreign-type 'PyObject))
-                 (value (make-foreign-pointer :foreign-address (fslot-value-typed #1# :foreign value*)
-                                              :foreign-type 'PyObject))
-                 (traceback (make-foreign-pointer :foreign-address (fslot-value-typed #1# :foreign traceback*)
-                                                  :foreign-type 'PyObject)))
-             (prog1 (make-instance 'python-error :msg (string+ place)
-                                                 :type type
-                                                 :value value
-                                                 :traceback traceback)
-               (PyErr_Clear)))))
+         (with-stack-fobjects ((type 'PyPtr)
+                               (value 'PyPtr)
+                               (traceback 'PyPtr))
+           (PyErr_Fetch type value traceback)
+           (PyErr_NormalizeException type value traceback)
+           (prog1 ;; (make-instance 'python-error :msg (string+ place)
+               ;;                              :type type
+               ;;                              :value value
+               ;;                              :traceback traceback)
+               (string+ place)
+             (PyErr_Clear))))
         (t (make-foreign-pointer :foreign-address 0 :foreign-type 'PyObject))))
 
 (defmacro pycheckn (form &optional place)
