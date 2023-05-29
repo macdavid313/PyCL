@@ -13,18 +13,20 @@ Py_LIMITED_API=0x03070000
 LLVM_VERSION=14
 BINDING_BUILDER_IMAGE=pycl.binding.builder
 
-ifndef LISP
-$(error LISP is not set)
-endif
-
 pycl.fasl: find_libpython.py
-	@[[ -f "sys/capi.cl" ]] && echo "found sys/capi.cl" || ( echo "Please run 'make sys/capi.cl'"; exit 1 )
+ifndef LISP
+	$(error LISP is not set)
+endif
+	@if [ ! -f "sys/capi.cl" ]; then echo "Please run 'make sys/capi.cl'" && exit 1; fi;
 	$(LISP) -W -L pkg.cl -e '(build-pycl)' --kill
 
 find_libpython.py:
 	cp pycl/find_libpython.py ./
 
 sys/capi.cl: sys/libpython.binding.sexp
+ifndef LISP
+	$(error LISP is not set)
+endif
 	$(LISP) -W -L sys/gen.cl --kill >sys/capi.cl
 
 sys/libpython.binding.sexp:
