@@ -12,5 +12,12 @@
            #:+PyGILState_LOCKED+
            #:+PyGILState_UNLOCKED+
            #:+libpython-extern-variables+
-           #:PyPtr
-           #:with-python-gil))
+           #:with-python-gil
+           #:pyobject
+           #:pyobject-p
+           #:@pyobject
+           #:pyobject-eq
+           #:pyincref
+           #:pydecref
+           #:pydecref*
+           #:pystealref))

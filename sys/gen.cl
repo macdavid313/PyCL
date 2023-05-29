@@ -30,7 +30,7 @@
                         ((PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef PyModuleDef_Base PyModuleDef PyStructSequence_Field PyStructSequence_Desc PyType_Slot PyType_Spec)
                          (if* ret
                             then `((* ,(second x)) t foreign-python-funcall-converter/returning)
-                            else `((* ,(second x)) t foreign-python-funcall-converter/arg)))
+                            else `((* ,(second x)))))
                         (:char '((* :char) #+32bit (unsigned-byte 32) #+64bit (unsigned-byte 64))) ; char*
                         (size_t '((* :unsigned-nat)))
                         (int64_t '((* :long-long)))

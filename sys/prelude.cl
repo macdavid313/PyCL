@@ -103,31 +103,25 @@
      (slots (* PyType_Slot))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  ;; a pointer wrapper around C struct pointer, e.g. (most of the time)
-  ;; **PyObject
-  (def-foreign-type PyPtr (* :unsigned-nat))
+  (defclass pyptr (foreign-pointer)
+    ()
+    (:documentation "A reference to a python foreign pointer that is guaranteed to be VALID (non-null)."))
 
-  (defun foreign-python-funcall-converter/arg (action pyptr ctype ltype)
-    "Convert a foreign pointer to the corresponding foreign address."
-    (declare (ignore ctype ltype)
-             (optimize (speed 3) (safety 0) (space 0)))
-    (case action
-      (:convert (if* (typep pyptr 'PyPtr)
-                   then (fslot-value-typed 'PyPtr :foreign pyptr)
-                   else pyptr))
-      (:convert-type 'integer)
-      (:identify :arg)
-      (:check t)))
+  (defmethod print-object ((fp pyptr) stream)
+    (let ((*print-base* 16))
+      (format stream "#<~a @ #x~a>"
+              (foreign-pointer-type fp)
+              (foreign-pointer-address fp))))
 
   (defun foreign-python-funcall-converter/returning (action address ctype ltype)
-    "Convert a foriegn address to a PyPtr."
-    (declare (ignore ctype ltype)
+    "Convert a foriegn address to a foreign pointer."
+    (declare (ignore ltype)
              (type (unsigned-byte #+32bit 32 #+64bit 64) address)
              (optimize (speed 3) (safety 0) (space 0)))
     (case action
-      (:convert (let ((pyptr (allocate-fobject 'PyPtr :foreign)))
-                  (setf (fslot-value-typed 'PyPtr :foreign pyptr) address)
-                  pyptr))
+      (:convert (and (/= 0 address)
+                     (make-instance 'pyptr :foreign-address address
+                                           :foreign-type (second ctype))))
       (:convert-type 'integer)
       (:identify :return)
       (:allocate nil)

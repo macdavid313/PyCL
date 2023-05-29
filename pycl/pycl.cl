@@ -19,59 +19,13 @@
 (defgeneric from-pyobject (pyobj output-type-spec)
   (:documentation "Convert a PyObject foreign pointer to a value by the given lisp type specifier."))
 
-(defun pycheckv (res checker place)
-  (cond ((funcall checker res)
-         res)
-        ((not (pynull (PyErr_Occurred)))
-         (with-stack-fobjects ((type 'PyPtr)
-                               (value 'PyPtr)
-                               (traceback 'PyPtr))
-           (PyErr_Fetch type value traceback)
-           (PyErr_NormalizeException type value traceback)
-           (prog1 ;; (make-instance 'python-error :msg (string+ place)
-               ;;                              :type type
-               ;;                              :value value
-               ;;                              :traceback traceback)
-               (string+ place)
-             (PyErr_Clear))))
-        (t (make-foreign-pointer :foreign-address 0 :foreign-type 'PyObject))))
-
-(defmacro pycheckn (form &optional place)
-  (let ((res (gensym "res"))
-        (place (if place place (car form))))
-    `(let ((,res ,form))
-       (pycheckv ,res #.(complement 'pynull) ',place))))
-
-(defmacro pycheckz (form &optional place)
-  (let ((res (gensym "res"))
-        (place (if place place (car form))))
-    `(let ((,res ,form))
-       (pycheckv ,res #.(complement 'minusp) ',place))))
-
-(defun pynull (ob)
-  (etypecase ob
-    (foreign-pointer (= 0 (foreign-pointer-address ob)))
-    (unsigned-byte (= 0 ob))))
-
-(defun pyincref (o)
-  (with-python-gil ()
-    (Py_IncRef o)
-    o))
-
-(defun pydecref (o)
-  (when (not (pynull o))
-    (with-python-gil ()
-      (Py_DecRef o))
-    (setf (foreign-pointer-address o) 0))
-  o)
-
 (defun pystr (ob)
   (let (ob_unicode ob_bytes bytes)
-    (setq ob_unicode (PyObject_Str ob))
-    (assert (not (pynull ob_unicode)))
+    (setq ob_unicode (pycheckn (PyObject_Str ob)))
+    (assert (not (null ob_unicode)))
     (setq ob_bytes (PyUnicode_AsUTF8String ob_unicode))
     (pydecref ob_unicode)
-    (assert (not (pynull ob_bytes)))
+    (assert (not (null ob_bytes)))
     (setq bytes (PyBytes_AsString ob_bytes))
     (pydecref ob_bytes)
     (values (native-to-string bytes))))
@@ -79,10 +33,10 @@
 (defun pyrepr (ob)
   (let (ob_unicode ob_bytes bytes)
     (setq ob_unicode (PyObject_Repr ob))
-    (assert (not (pynull ob_unicode)))
+    (assert (not (null ob_unicode)))
     (setq ob_bytes (PyUnicode_AsUTF8String ob_unicode))
     (pydecref ob_unicode)
-    (assert (not (pynull ob_bytes)))
+    (assert (not (null ob_bytes)))
     (setq bytes (PyBytes_AsString ob_bytes))
     (pydecref ob_bytes)
     (values (native-to-string bytes))))
@@ -106,30 +60,6 @@
 ;;                                 :val (python-error-val e)
 ;;                                 :traceback (python-error-traceback e)))
 
-
-;; (defun pyobject-p (thing)
-;;   (and (foreign-pointer-p thing)
-;;        (eq 'PyObject (foreign-pointer-type thing))))
-
-;; (deftype pyobject ()
-;;   '(satisfies pyobject-p))
-
-;; (defun pyobject-eq (x y)
-;;   (check-type x pyobject)
-;;   (check-type y pyobject)
-;;   (= (foreign-pointer-address x)
-;;      (foreign-pointer-address y)))
-
-;; (defun pystealref (ob)
-;;   (declare (type pyobject ob))
-;;   (let ((original-fp (foreign-pointer-address ob)))
-;;     (setf (foreign-pointer-address ob) 0)
-;;     original-fp))
-;;
-;;; pyobject APIs
-;; (defun pyreturn (o)
-;;   (declare (type pyobject o))
-;;   (foreign-pointer-address (pyincref (to-pyobject o))))
 
 ;; (defun pytypep (o type)
 ;;   (check-type o pyobject)
