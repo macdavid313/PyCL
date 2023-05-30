@@ -5,17 +5,12 @@
   ((reason :initarg :reason :initform "" :type simple-string)))
 
 (defmethod report-pycl-condition ((err start-python-error) stream)
-  (format stream "Start Python FAILED!~%~a" (slot-value err 'reason)))
+  (format stream "Python Initialization FAILED!~%~a" (slot-value err 'reason)))
 
 (defconstant +minimum-python-version+ "3.7")
 
 (defvar-nonbindable *python* nil
   "A python interpreter instance.")
-
-(defvar-nonbindable *python-global-pointers* nil
-  "A list of symbols that can be used to reference valid (non-null) global
-pointers processed from +libpython-extern-variables+. It is probably only useful
-for diagnostic purposes.")
 
 (eval-when (:load-toplevel)
   (defparameter *find_libpython.py*
@@ -121,26 +116,56 @@ else:
           (error 'start-python-error :reason "In init-python-program-name, error raise from calling Py_DecodeLocale"))
         (Py_SetProgramName w)))))
 
+(defvar-nonbindable *python-global-raw-pointers* nil
+  "A list of symbols that can be used to reference valid (non-null) global
+pointers processed from +libpython-extern-variables+. It is probably only useful
+for diagnostic purposes.")
+
+(defvar-nonbindable *global-raw-pointers-table* (make-hash-table :test 'eq)
+  "Mapping between a symbol and the foreign address, e.g. 'PyExc_IOError -> #x0000ffff")
+
+(defvar-nonbindable *global-raw-pointers-reverse-table* (make-hash-table :test '=)
+  "Mapping between a foreign address and the corresponding name as a symbol, e.g. #x0000ffff -> 'PyExc_IOError")
+
+(defun pyglobalptr (symbol-or-address)
+  (let ((k symbol-or-address))
+    (etypecase symbol-or-address
+      (symbol (gethash k *global-raw-pointers-table*))
+      ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k *global-raw-pointers-reverse-table*)))))
+
+(defun (setf pyglobalptr) (new-addr k)
+  (check-type k symbol)
+  (check-type new-addr (unsigned-byte #+32bit 32 #+64bit 64))
+  (multiple-value-bind (old-addr exists-p)
+      (gethash k *global-raw-pointers-table*)
+    (when exists-p
+      (warn "Redefining python global pointer '~a from ~s to ~s" k old-addr new-addr)
+      (remhash old-addr *global-raw-pointers-reverse-table*)))
+  (pushnew k *python-global-raw-pointers* :test 'eq)
+  (setf (gethash k *global-raw-pointers-table*) new-addr
+        (gethash new-addr *global-raw-pointers-reverse-table*) k))
+
 (defun defglobalptr-helper (name &key pointer-p)
   (let ((address (get-entry-point name))) ; entry address
     (when pointer-p     ; deref if tagged with :pointer e.g. (:pointer PyObject)
       (setq address (fslot-value-typed :unsigned-nat :c address)))
+    (check-type address (unsigned-byte #+32bit 32 #+64bit 64))
+    (assert (/= 0 address))
     (funcall
      `(lambda ()
-        (defconstant ,(intern name) ,address)))))
+        (setf (pyglobalptr ',(intern name)) ,address)))))
 
 (defun startup ()
   "This function runs after a python instance has been successfully initialized."
   ;; step1: initialize global pointers
   (dolist (spec +libpython-extern-variables+)
     (when (get-entry-point (first spec)) ; validate extern variable
-      (apply 'defglobalptr-helper spec)
-      (push (intern (first spec)) *python-global-pointers*)))
+      (apply 'defglobalptr-helper spec)))
   ;; step 2: initialize Py_None, Py_False, and Py_True
   ;; they need to be defined separately because they are aliased
-  (defconstant Py_None  (symbol-value '_Py_NoneStruct))
-  (defconstant Py_False (symbol-value '_Py_FalseStruct))
-  (defconstant Py_True  (symbol-value '_Py_TrueStruct))
+  (setf (pyglobalptr 'Py_None)  (get-entry-point "_Py_NoneStruct"))
+  (setf (pyglobalptr 'Py_False) (get-entry-point "_Py_FalseStruct"))
+  (setf (pyglobalptr 'Py_True)  (get-entry-point "_Py_TrueStruct"))
   ;; end of startup
   t)
 
@@ -183,4 +208,9 @@ else:
     (ignore-errors (Py_FinalizeEx))     ; TODO: handle error value -1?
     (when (and unload-libpython (python-libpython *python*))
       (unload-foreign-library (python-libpython *python*)))
-    (setf *python* nil)))
+    (setf *python-global-raw-pointers* nil)
+    (clrhash *global-raw-pointers-table*)
+    (clrhash *global-raw-pointers-reverse-table*)
+    (setf *python* nil)
+    (setf (sys:getenv "PYTHONIOENCODING") nil
+          (sys:getenv "PYTHONHOME") nil)))
