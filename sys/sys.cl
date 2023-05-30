@@ -125,3 +125,11 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
 
 (defgeneric report-pycl-condition (c stream)
   (:documentation "Report pycl and python related condition."))
+
+;;; Utilities
+(defun pyunicode-to-native (ob)
+  (let ((ob_bytes (PyUnicode_AsUTF8String ob)))
+    (if* (pynull ob_bytes)
+       then 0
+       else (Py_DecRef ob_bytes)
+            (PyBytes_AsString ob_bytes))))

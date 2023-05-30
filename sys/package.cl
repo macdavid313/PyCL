@@ -17,8 +17,10 @@
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
+   ;; --- GIL
    #:check-python-gil
    #:with-python-gil
+   ;; --- pyobject
    #:make-pyobject
    #:pyobject-p
    #:pyobject
@@ -28,5 +30,8 @@
    #:pydecref
    #:pydecref*
    #:pystealref
+   ;; --- conditions
    #:pycl-condition
-   #:report-pycl-condition))
+   #:report-pycl-condition
+   ;; --- utilities
+   #:pyunicode-to-native))
