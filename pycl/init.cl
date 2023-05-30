@@ -100,11 +100,11 @@ else:
 (defmethod print-object ((py python) stream)
   (with-slots (libpython exe program home version) py
     (print-unreadable-object (py stream :type t :identity t)
-      (with-stack-list (lines (string+ "LIBPYTHON: "   libpython)
-                              (string+ "  EXE:       " exe)
-                              (string+ "  PROGRAM:   " program)
-                              (string+ "  HOME:      " home)
-                              (string+ "  VERSION:   " version))
+      (with-stack-list (lines (string+ "libpython: "   libpython)
+                              (string+ "  exe:       " exe)
+                              (string+ "  program:   " program)
+                              (string+ "  home:      " home)
+                              (string+ "  version:   " version))
         (format stream "~{~a~^~%~}~%" lines)))))
 
 (defun init-python-program-name (program)
