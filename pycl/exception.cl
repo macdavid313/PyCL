@@ -11,28 +11,27 @@ construct the \"msg\"."))
 (defmethod print-object ((exc python-exception) stream)
   (print-unreadable-object (exc stream :type t)
     (with-slots (type place msg) exc
-      (if* type
-         then (format stream "from (~a), caught python exception: ~%~a"
-                             place msg)
-         else (format stream "from (~a), a python exception has occurred"
-                             place)))))
+      (when place
+        (format stream "from (~a), caught python exception: ~%~a"
+                place msg)))))
 
-(defun pyexcept (place)
+(defun pyerror (&optional place)
   (if* (pynull (PyErr_Occurred))
-     then (make-instance 'python-exception :type nil :place place :msg "None")
-     else (with-stack-fobjects ((ob_type* #1='(* PyObject))
-                                (ob_value* #1#)
-                                (ob_traceback* #1#))
+     then (error 'python-exception :type nil :place place :msg "None") ; will it happen at all?
+     else (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
+                                 (ob_value* #1# :allocation :c)
+                                 (ob_traceback* #1# :allocation :c))
             (PyErr_Fetch ob_type* ob_value* ob_traceback*)
             (PyErr_NormalizeException ob_type* ob_value* ob_traceback*)
-            (let ((ob_type (make-pyobject (fslot-value-typed #1# :foreign ob_type*)))
-                  (ob_value (make-pyobject (fslot-value-typed #1# :foreign ob_value*)))
-                  (ob_traceback (make-pyobject (fslot-value-typed #1# :foreign ob_traceback*))))
-              (prog1 (make-instance 'python-exception
-                                    :type (pyglobalptr ob_type)
-                                    :place place
-                                    :msg (format-python-exception ob_type ob_value ob_traceback))
-                (PyErr_Clear))))))
+            (let* ((ob_type (make-pyobject (fslot-value-typed #1# :c ob_type*)))
+                   (ob_value (make-pyobject (fslot-value-typed #1# :c ob_value*)))
+                   (ob_traceback (make-pyobject (fslot-value-typed #1# :c ob_traceback*)))
+                   (exc (make-instance 'python-exception
+                                       :type (pyglobalptr ob_type)
+                                       :place place
+                                       :msg (format-python-exception ob_type ob_value ob_traceback))))
+              (PyErr_Clear)
+              (error exc)))))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
@@ -57,7 +56,7 @@ construct the \"msg\"."))
          else (setq ob_formatter (pyglobalptr '%python-callable/traceback.format_exception%))
               (setq ob_tuple (PyTuple_New 3)))
       (if* (pynull ob_tuple)
-         then ""
+         then "None"
          else (PyTuple_SetItem ob_tuple 0 (pystealref ob_type))
               (PyTuple_SetItem ob_tuple 1 (pystealref ob_value))
               (when (not (pynull ob_traceback))
@@ -66,21 +65,21 @@ construct the \"msg\"."))
               (prog1 (format-exception ob_list)
                 (pydecref* ob_tuple ob_list))))))
 
-(defun pycheckv (res checker place)
+(defun pycheck (res checker place)
   (declare (ftype (function (thing) (or t nil)) checker)
            (type symbol place))
   (if* (funcall checker res)
      then res
-     else (error (pyexcept place))))
+     else (pyerror place)))
 
 (defmacro pycheckn (form &optional place)
   (let ((res (gensym "res"))
         (place (if place place (car form))))
     `(let ((,res ,form))
-       (pycheckv ,res #.(complement 'pynull) ',place))))
+       (pycheck ,res #.(complement 'pynull) ',place))))
 
 (defmacro pycheckz (form &optional place)
   (let ((res (gensym "res"))
         (place (if place place (car form))))
     `(let ((,res ,form))
-       (pycheckv ,res #.(complement 'minusp) ',place))))
+       (pycheck ,res #.(complement 'minusp) ',place))))
