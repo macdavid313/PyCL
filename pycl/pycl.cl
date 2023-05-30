@@ -51,16 +51,6 @@
 ;;       (setq err )))
 ;;   )
 
-;;; Exceptions
-;; (defun make-python-error (msg)
-;;   (declare (type (or nil python-error) e)
-;;            (ignorable e))
-;;   (make-condition 'python-error :msg (string+ msg)
-;;                                 :type (python-error-type e)
-;;                                 :val (python-error-val e)
-;;                                 :traceback (python-error-traceback e)))
-
-
 ;; (defun pytypep (o type)
 ;;   (check-type o pyobject)
 ;;   (check-type type pyobject)
@@ -76,6 +66,3 @@
 ;;                      :c                          ; allocation
 ;;                      (foreign-pointer-address o) ; fp
 ;;                      'pycl.sys::ob_type)) ; fslot
-
-;;; Exceptions
-;;; see also conditions.cl

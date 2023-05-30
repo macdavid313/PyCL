@@ -12,8 +12,8 @@
                    "sys/sys"
                    ;; start of pycl module
                    "pycl/package"
-                   "pycl/conditions"
                    "pycl/init"
+                   "pycl/exception"
                    "pycl/pycl"
                    ;; files list ends here
                    )))

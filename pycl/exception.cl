@@ -1,16 +1,11 @@
-;;;; conditions.cl
+;;;; exception.cl
 (in-package #:pycl)
-
-(define-condition pycl-condition (condition)
-  ()
-  (:report report-pycl-condition))
-
-(defgeneric report-pycl-condition (c stream)
-  (:documentation "Report pycl and python related condition"))
 
 (define-condition python-exception (pycl-condition error)
   ((place :initarg :place :accessor python-exception-place :type symbol)
-   (msg :initarg :msg :accessor python-exception-msg :type (or null simple-string))))
+   (msg :initarg :msg :accessor python-exception-msg :type (or null simple-string)))
+  (:documentation "A simple condition that represents a python exception. User is responsible to
+construct the \"msg\"."))
 
 (defmethod report-pycl-condition ((exc python-exception) stream)
   (with-slots (place msg) exc

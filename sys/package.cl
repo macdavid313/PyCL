@@ -6,18 +6,24 @@
         #:excl
         #:ff
         #:util.string)
-  (:export #:+PY_LOCK_FAILURE+
-           #:+PY_LOCK_ACQUIRED+
-           #:+PY_LOCK_INTR+
-           #:+PyGILState_LOCKED+
-           #:+PyGILState_UNLOCKED+
-           #:+libpython-extern-variables+
-           #:with-python-gil
-           #:pyobject
-           #:pyobject-p
-           #:@pyobject
-           #:pyobject-eq
-           #:pyincref
-           #:pydecref
-           #:pydecref*
-           #:pystealref))
+  (:export
+   ;; prelude
+   #:+PY_LOCK_FAILURE+
+   #:+PY_LOCK_ACQUIRED+
+   #:+PY_LOCK_INTR+
+   #:+PyGILState_LOCKED+
+   #:+PyGILState_UNLOCKED+
+   ;; capi
+   #:+libpython-extern-variables+
+   ;; sys
+   #:with-python-gil
+   #:pyobject
+   #:pyobject-p
+   #:@pyobject
+   #:pyobject-eq
+   #:pyincref
+   #:pydecref
+   #:pydecref*
+   #:pystealref
+   #:pycl-condition
+   #:report-pycl-condition))
