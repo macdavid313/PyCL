@@ -25,14 +25,16 @@
     (string+ (directory-namestring *load-pathname*) "pycl.fasl")))
 
 (defun compile-and-load-pycl ()
-  (dolist (file *pycl-src-files*)
-    (load (compile-file-if-needed (string+ file ".cl")
-                                  :load-after-compile nil))))
+  (let (fasls)
+    (dolist (file *pycl-src-files*)
+      (push (compile-file (string+ file ".cl")
+                          :load-after-compile t)
+            fasls))
+    (nreverse fasls)))
 
 (defun build-pycl ()
-  (compile-and-load-pycl)
   (with-open-file (out *pycl-fasl-output* :direction :output
                                           :if-exists :supersede
                                           :if-does-not-exist :create)
-    (dolist (file *pycl-src-files*)
-      (sys:copy-file (string+ file ".fasl") out))))
+    (dolist (fasl (compile-and-load-pycl))
+      (sys:copy-file fasl out))))
