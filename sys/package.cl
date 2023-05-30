@@ -32,6 +32,5 @@
    #:pystealref
    ;; --- conditions
    #:pycl-condition
-   #:report-pycl-condition
    ;; --- utilities
    #:pyunicode-to-native))

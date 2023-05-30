@@ -54,6 +54,10 @@
   '(satisfies pyobject-p))
 
 (defun pynull (thing)
+  ;; pynull is a bit of tricky ...
+  ;; (defun pynotnull (thing)
+  ;;   (and (pyobject-p thing)
+  ;;        (not (eq thing +pynull+))))
   (if* (pyobject-p thing)
      then (eq thing +pynull+)
      else thing))
@@ -120,16 +124,17 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
 
 ;;; Conditions
 (define-condition pycl-condition (condition)
-  ()
-  (:report report-pycl-condition))
-
-(defgeneric report-pycl-condition (c stream)
-  (:documentation "Report pycl and python related condition."))
+  ())
 
 ;;; Utilities
+(declaim (ftype (function (pyobject) (unsigned-byte #+32bit 32 #+64bit 64)) pyunicode-to-native))
 (defun pyunicode-to-native (ob)
-  (let ((ob_bytes (PyUnicode_AsUTF8String ob)))
-    (if* (pynull ob_bytes)
-       then 0
-       else (Py_DecRef ob_bytes)
-            (PyBytes_AsString ob_bytes))))
+  (declare (type pyobject ob)
+           (optimize (speed 3) (safety 0) (space 0)))
+  (if* (pynull ob)
+     then 0
+     else (let ((ob_bytes (PyUnicode_AsUTF8String ob)))
+            (if* (pynull ob_bytes)
+               then 0
+               else (Py_DecRef ob_bytes)
+                    (PyBytes_AsString ob_bytes)))))

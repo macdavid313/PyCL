@@ -4,7 +4,7 @@
 (define-condition start-python-error (pycl-condition error)
   ((reason :initarg :reason :initform "" :type simple-string)))
 
-(defmethod report-pycl-condition ((err start-python-error) stream)
+(defmethod print-object ((err start-python-error) stream)
   (format stream "Python Initialization FAILED!~%~a" (slot-value err 'reason)))
 
 (defconstant +minimum-python-version+ "3.7")
@@ -129,21 +129,25 @@ for diagnostic purposes.")
 
 (defun pyglobalptr (symbol-or-address)
   (let ((k symbol-or-address))
-    (etypecase symbol-or-address
-      (symbol (gethash k *global-raw-pointers-table*))
-      ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k *global-raw-pointers-reverse-table*)))))
+    (multiple-value-bind (val exists-p)
+        (etypecase symbol-or-address
+          (symbol (gethash k *global-raw-pointers-table*))
+          (foreign-pointer (gethash (foreign-pointer-address k) *global-raw-pointers-reverse-table*))
+          ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k *global-raw-pointers-reverse-table*)))
+      (if exists-p val nil))))
 
-(defun (setf pyglobalptr) (new-addr k)
-  (check-type k symbol)
-  (check-type new-addr (unsigned-byte #+32bit 32 #+64bit 64))
+(defun (setf pyglobalptr) (new-addr sym)
+  (check-type sym symbol)
+  (check-type new-addr (or foreign-pointer (unsigned-byte #+32bit 32 #+64bit 64)))
+  (when (foreign-pointer-p new-addr) (setq new-addr (foreign-pointer-address new-addr)))
   (multiple-value-bind (old-addr exists-p)
-      (gethash k *global-raw-pointers-table*)
+      (gethash sym *global-raw-pointers-table*)
     (when exists-p
-      (warn "Redefining python global pointer '~a from ~s to ~s" k old-addr new-addr)
+      (warn "Redefining python global pointer '~a from ~s to ~s" sym old-addr new-addr)
       (remhash old-addr *global-raw-pointers-reverse-table*)))
-  (pushnew k *python-global-raw-pointers* :test 'eq)
-  (setf (gethash k *global-raw-pointers-table*) new-addr
-        (gethash new-addr *global-raw-pointers-reverse-table*) k))
+  (pushnew sym *python-global-raw-pointers* :test 'eq)
+  (setf (gethash sym *global-raw-pointers-table*) new-addr
+        (gethash new-addr *global-raw-pointers-reverse-table*) sym))
 
 (defun defglobalptr-helper (name &key pointer-p)
   (let ((address (get-entry-point name))) ; entry address
@@ -154,6 +158,36 @@ for diagnostic purposes.")
     (funcall
      `(lambda ()
         (setf (pyglobalptr ',(intern name)) ,address)))))
+
+(defun %load-traceback-module ()
+  (when (not #1=(pyglobalptr '%python-module/traceback%))
+    (let (ob_module)
+      (with-native-string (module "traceback" :external-format :utf-8)
+        (setq ob_module (PyImport_ImportModule module)))
+      (if* (pynull ob_module)
+         then (error 'start-python-error :reason "Cannot load 'traceback' module")
+         else (setf #1# ob_module))))
+  #1#)
+
+(defun %load-format-exception-callable ()
+  (when (not #1=(pyglobalptr '%python-callable/traceback.format_exception%))
+    (let (ob_callable)                  ; new
+      (with-native-string (str "format_exception" :external-format :utf-8)
+        (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
+      (if* (pynull ob_callable)
+         then (error 'start-python-error :reason "Cannot load 'format_exception' function from traceback module")
+         else (setf #1# ob_callable))))
+  #1#)
+
+(defun %load-format-exception-only-callable ()
+  (when (not #1=(pyglobalptr '%python-callable/traceback.format_exception_only%))
+    (let (ob_callable)                  ; new
+      (with-native-string (str "format_exception_only" :external-format :utf-8)
+        (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
+      (if* (pynull ob_callable)
+         then (error 'start-python-error :reason "Cannot load 'format_exception_only' function from traceback module")
+         else (setf #1# ob_callable))))
+  #1#)
 
 (defun startup ()
   "This function runs after a python instance has been successfully initialized."
@@ -166,6 +200,13 @@ for diagnostic purposes.")
   (setf (pyglobalptr 'Py_None)  (get-entry-point "_Py_NoneStruct"))
   (setf (pyglobalptr 'Py_False) (get-entry-point "_Py_FalseStruct"))
   (setf (pyglobalptr 'Py_True)  (get-entry-point "_Py_TrueStruct"))
+  ;; step 3: initialize pointers for
+  ;; ------- trackback module
+  ;; ------- trackback.format_exception
+  ;; ------- traceback.format_exception_only
+  (%load-traceback-module)
+  (%load-format-exception-callable)
+  (%load-format-exception-only-callable)
   ;; end of startup
   t)
 
