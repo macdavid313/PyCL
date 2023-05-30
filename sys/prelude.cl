@@ -107,6 +107,12 @@
     ()
     (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*"))
 
+  (when (not (boundp '+pynull+))
+    (defconstant +pynull+
+      (make-instance 'pyptr :foreign-type 'PyObject
+                            :foreign-address 0)
+      "A singleton that represents a NULL PyObject pointer"))
+
   (defmethod print-object ((fp pyptr) stream)
     (if* (= 0 (foreign-pointer-address fp))
        then (format stream "#<~a NULL>" (foreign-pointer-type fp))
@@ -121,13 +127,10 @@
              (type (unsigned-byte #+32bit 32 #+64bit 64) address)
              (optimize (speed 3) (safety 0) (space 0)))
     (case action
-      (:convert (when (/= 0 address)
-                  ;; return nil immedicately for a NULL python foreign pointer.
-                  ;; The motivation is to reduce unnecessary creation of pyptr
-                  ;; instances. Also, a NULL python foreign pointer should
-                  ;; probably be represented by a singleton anyway.
-                  (make-instance 'pyptr :foreign-address address
-                                        :foreign-type (second ctype))))
+      (:convert (if* (and (= 0 address) (eq 'PyObject (second ctype)))
+                   then +pynull+
+                   else (make-instance 'pyptr :foreign-address address
+                                              :foreign-type (second ctype))))
       (:convert-type 'integer)
       (:identify :return)
       (:allocate nil)

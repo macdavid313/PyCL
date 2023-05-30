@@ -13,13 +13,15 @@
    #:+PY_LOCK_INTR+
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
+   #:+pynull+
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
    #:with-python-gil
-   #:pyobject
+   #:make-pyobject
    #:pyobject-p
-   #:@pyobject
+   #:pyobject
+   #:pynull
    #:pyobject-eq
    #:pyincref
    #:pydecref

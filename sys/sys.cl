@@ -24,10 +24,17 @@
 
 ;;; pyobject
 ;;; APIs and Utilities
-(defmacro @pyobject (address)
-  `(and (/= 0 ,address)
-        (make-instance 'pyptr :foreign-address ,address
-                              :foreign-type 'PyObject)))
+(defun make-pyobject (address)
+  (if* (= 0 address)
+     then +pynull+
+     else (make-instance 'pyptr :foreign-address address
+                                :foreign-type 'PyObject)))
+
+(define-compiler-macro make-pyobject (address)
+  `(if* (= 0 ,address)
+      then +pynull+
+      else (make-instance 'pyptr :foreign-address ,address
+                                 :foreign-type 'PyObject)))
 
 (defun pyobject-p (thing)
   (and (typep thing 'pyptr)
@@ -39,6 +46,16 @@
 
 (deftype pyobject ()
   '(satisfies pyobject-p))
+
+(defun pynull (thing)
+  (if* (pyobject-p thing)
+     then (eq thing +pynull+)
+     else thing))
+
+(define-compiler-macro pynull (thing)
+  `(if* (pyobject-p ,thing)
+      then (eq ,thing +pynull+)
+      else ,thing))
 
 (defun pyobject-eq (x y)
   (and (pyobject-p x)
@@ -53,36 +70,36 @@
            (foreign-pointer-address ,y))))
 
 (defun pyincref (ob)
-  (when (pyobject-p ob)
+  (when (not (pynull ob))
     (Py_IncRef ob))
   ob)
 
 (define-compiler-macro pyincref (ob)
-  `(progn (when (pyobject-p ,ob)
+  `(progn (when (not (pynull ,ob))
             (Py_IncRef ,ob))
           ,ob))
 
 (defun pydecref (ob)
-  (when (pyobject-p ob)
+  (when (not (pynull ob))
     (Py_DecRef ob)
     (setf (foreign-pointer-address ob) 0))
-  nil)
+  +pynull+)
 
 (define-compiler-macro pydecref (ob)
-  `(prog1 nil
-     (when (pyobject-p ,ob)
+  `(prog1 +pynull+
+     (when (not (pynull ,ob))
        (Py_DecRef ,ob)
        (setf (foreign-pointer-address ,ob) 0))))
 
 (defun pydecref* (&rest obs)
   (dolist (ob obs nil)
-    (when (pyobject-p ob)
+    (when (not (pynull ob))
       (Py_DecRef ob)
       (setf (foreign-pointer-address ob) 0))))
 
 (define-compiler-macro pydecref* (&rest obs)
   (flet ((transform (ob)
-           `(when (pyobject-p ,ob)
+           `(when (not (pynull ,ob))
               (Py_DecRef ,ob)
               (setf (foreign-pointer-address ,ob) 0))))
     `(progn ,@(mapcar #'transform obs)
@@ -91,10 +108,9 @@
 (defmacro pystealref (ob-var)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
 This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
-  `(when (pyobject-p ,ob-var)
+  `(when (not (pynull ,ob-var))
      (prog1 (foreign-pointer-address ,ob-var)
-       (setf (foreign-pointer-address ,ob-var) 0)
-       (setf ,ob-var nil))))
+       (setf ,ob-var +pynull+))))
 
 ;;; Conditions
 (define-condition pycl-condition (condition)
@@ -103,8 +119,3 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
 
 (defgeneric report-pycl-condition (c stream)
   (:documentation "Report pycl and python related condition."))
-
-(defmethod print-object ((c pycl-condition) stream)
-  "Default printer for pycl-condition."
-  (print-unreadable-object (c stream :type t :identity t)
-    (report-pycl-condition c stream)))
