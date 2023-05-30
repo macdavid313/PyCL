@@ -131,20 +131,12 @@ else:
 
 (defun startup ()
   "This function runs after a python instance has been successfully initialized."
-  ;; step 1: define PyGILState_Check if available
-  (when (and (not (fboundp 'PyGILState_Check))
-             (get-entry-point "PyGILState_Check"))
-    (def-foreign-call PyGILState_Check (:void)
-      :returning :boolean
-      :arg-checking nil
-      :call-direct t
-      :allow-gc :always))
-  ;; step2: initialize global pointers
+  ;; step1: initialize global pointers
   (dolist (spec +libpython-extern-variables+)
     (when (get-entry-point (first spec)) ; validate extern variable
       (apply 'defglobalptr-helper spec)
       (push (intern (first spec)) *python-global-pointers*)))
-  ;; step 3: initialize Py_None, Py_False, and Py_True
+  ;; step 2: initialize Py_None, Py_False, and Py_True
   ;; they need to be defined separately because they are aliased
   (defconstant Py_None  (symbol-value '_Py_NoneStruct))
   (defconstant Py_False (symbol-value '_Py_FalseStruct))

@@ -17,6 +17,7 @@
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
+   #:check-python-gil
    #:with-python-gil
    #:make-pyobject
    #:pyobject-p

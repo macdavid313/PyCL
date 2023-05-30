@@ -2,6 +2,12 @@
 (in-package :pycl.sys)
 
 ;;; GIL
+(def-foreign-call (check-python-gil "PyGILState_Check") (:void)
+  :returning :boolean
+  :arg-checking nil
+  :call-direct t
+  :allow-gc :always)
+
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
   (declare (ignore safe))
