@@ -48,7 +48,8 @@
 (defun pydecref (ob)
   (when (pyobject-p ob)
     (with-python-gil ()
-      (Py_DecRef ob)))
+      (Py_DecRef ob))
+    (setf (foreign-pointer-address ob) 0))
   nil)
 
 (defun pydecref* (&rest obs)
@@ -60,8 +61,11 @@
   nil)
 
 (defmacro pystealref (ob-var)
+  "The caller (thief) will take the ownership so you are NOT responsible anymore.
+This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
   `(when (pyobject-p ,ob-var)
      (prog1 (foreign-pointer-address ,ob-var)
+       (setf (foreign-pointer-address ,ob-var) 0)
        (setf ,ob-var nil))))
 
 ;;; Compiler macros

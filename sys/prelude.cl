@@ -105,13 +105,15 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defclass pyptr (foreign-pointer)
     ()
-    (:documentation "A reference to a python foreign pointer that is guaranteed to be VALID (non-null)."))
+    (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*"))
 
   (defmethod print-object ((fp pyptr) stream)
-    (let ((*print-base* 16))
-      (format stream "#<~a @ #x~a>"
-              (foreign-pointer-type fp)
-              (foreign-pointer-address fp))))
+    (if* (= 0 (foreign-pointer-address fp))
+       then (format stream "#<~a NULL>" (foreign-pointer-type fp))
+       else (let ((*print-base* 16))
+              (format stream "#<~a @ #x~a>"
+                      (foreign-pointer-type fp)
+                      (foreign-pointer-address fp)))))
 
   (defun foreign-python-funcall-converter/returning (action address ctype ltype)
     "Convert a foriegn address to a foreign pointer."
@@ -119,9 +121,13 @@
              (type (unsigned-byte #+32bit 32 #+64bit 64) address)
              (optimize (speed 3) (safety 0) (space 0)))
     (case action
-      (:convert (and (/= 0 address)
-                     (make-instance 'pyptr :foreign-address address
-                                           :foreign-type (second ctype))))
+      (:convert (when (/= 0 address)
+                  ;; return nil immedicately for a NULL python foreign pointer.
+                  ;; The motivation is to reduce unnecessary creation of pyptr
+                  ;; instances. Also, a NULL python foreign pointer should
+                  ;; probably be represented by a singleton anyway.
+                  (make-instance 'pyptr :foreign-address address
+                                        :foreign-type (second ctype))))
       (:convert-type 'integer)
       (:identify :return)
       (:allocate nil)
