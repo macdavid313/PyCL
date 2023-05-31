@@ -134,12 +134,15 @@
     `(progn ,@(mapcar #'transform obs)
             nil)))
 
-(defmacro pystealref (ob-var)
+(defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
 This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
-  `(when (pyobject-p ,ob-var)
-     (prog1 (foreign-pointer-address ,ob-var)
-       (setf (foreign-pointer-address ,ob-var) 0))))
+  (cond ((pyobject-p ob)
+         (prog1 (foreign-pointer-address ob)
+           (setf (foreign-pointer-address ob) 0)))
+        ((pynull ob)
+         +pynull+)
+        (t nil)))
 
 ;;; Conditions
 (define-condition pycl-condition (condition)

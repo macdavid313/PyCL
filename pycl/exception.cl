@@ -2,23 +2,19 @@
 (in-package #:pycl)
 
 (define-condition python-exception (pycl-condition error)
-  ((type :initarg :type :accessor python-exception-type :type (or null symbol))
-   (place :initarg :place :accessor python-exception-place :type symbol)
-   (msg :initarg :msg :accessor python-exception-msg :type (or null simple-string)))
+  ((type :initarg :type :accessor pyexcept-type :type (or null symbol))
+   (msg :initarg :msg :accessor pyexcept-msg :type simple-string))
   (:documentation "A simple condition that represents a python exception. User is responsible to
 construct the \"msg\"."))
 
 (defmethod print-object ((exc python-exception) stream)
-  (print-unreadable-object (exc stream :type t)
-    (with-slots (type place msg) exc
-      (when place
-        (format stream "from (~a), caught python exception: ~%~a"
-                place msg)))))
+  (print-unreadable-object (exc stream :type t :identity t)
+    (with-slots (msg) exc
+      (format stream "- python exception caught: ~%~a" msg))))
 
-(defun make-python-exception (place)
-  (if* (pynull (PyErr_Occurred))
-     then +pynull+
-     else (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
+(defun @pyexcept ()
+  (if* (pyobject-p (PyErr_Occurred))
+     then (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
                                  (ob_value* #1# :allocation :c)
                                  (ob_traceback* #1# :allocation :c))
             (PyErr_Fetch ob_type* ob_value* ob_traceback*)
@@ -28,13 +24,10 @@ construct the \"msg\"."))
                    (ob_traceback (make-pyobject (fslot-value-typed #1# :c ob_traceback*)))
                    (exc (make-instance 'python-exception
                                        :type (pyglobalptr ob_type)
-                                       :place place
                                        :msg (format-python-exception ob_type ob_value ob_traceback))))
               (PyErr_Clear)
-              exc))))
-
-(defun pyerror (&optional place)
-  (error (make-python-exception place)))
+              exc))
+     else nil))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
@@ -68,21 +61,16 @@ construct the \"msg\"."))
               (prog1 (format-exception ob_list)
                 (pydecref* ob_tuple ob_list))))))
 
-(defun pycheck (res checker place)
-  (declare (ftype (function (thing) (or t nil)) checker)
-           (type symbol place))
-  (if* (funcall checker res)
-     then res
-     else (make-python-exception place)))
+(defun pyerror ()
+  (let ((e (@pyexcept)))
+    (when e (error e))))
 
-(defmacro pycheckn (form &optional place)
-  (let ((res (gensym "res"))
-        (place (if place place (car form))))
-    `(let ((,res ,form))
-       (pycheck ,res 'pyobject-p ',place))))
+(defun pycheckn (val)
+  (when (pynull val)
+    (pyerror))
+  val)
 
-(defmacro pycheckz (form &optional place)
-  (let ((res (gensym "res"))
-        (place (if place place (car form))))
-    `(let ((,res ,form))
-       (pycheck ,res #.(complement 'minusp) ',place))))
+(defun pycheckz (val)
+  (when (minusp val)
+    (pyerror))
+  val)
