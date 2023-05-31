@@ -16,6 +16,12 @@
   :call-direct t
   :allow-gc :always)
 
+(def-foreign-call PyRun_SimpleString ((command :foreign-address))
+  :returning :int
+  :arg-checking nil
+  :call-direct t
+  :allow-gc :always)
+
 ;;; GIL
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
