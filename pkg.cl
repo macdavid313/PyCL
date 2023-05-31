@@ -14,7 +14,7 @@
                    "pycl/package"
                    "pycl/init"
                    "pycl/exception"
-                   "pycl/pycl"
+                   "pycl/objects"
                    ;; files list ends here
                    )))
       (mapcar (lambda (file)

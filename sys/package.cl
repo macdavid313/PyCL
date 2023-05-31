@@ -17,11 +17,15 @@
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
-   ;; --- GIL
+   ;; "lost and found"
+   #:PyObject_DelAttrString
    #:check-python-gil
+   ;; --- GIL
    #:with-python-gil
    ;; --- pyobject
    #:make-pyobject
+   #:pyobject-pointer-p
+   #:pyobject-pointer
    #:pyobject-p
    #:pyobject
    #:pynull

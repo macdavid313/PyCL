@@ -15,9 +15,9 @@ construct the \"msg\"."))
         (format stream "from (~a), caught python exception: ~%~a"
                 place msg)))))
 
-(defun pyerror (&optional place)
+(defun make-python-exception (place)
   (if* (pynull (PyErr_Occurred))
-     then (error 'python-exception :type nil :place place :msg "None") ; will it happen at all?
+     then +pynull+
      else (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
                                  (ob_value* #1# :allocation :c)
                                  (ob_traceback* #1# :allocation :c))
@@ -31,7 +31,10 @@ construct the \"msg\"."))
                                        :place place
                                        :msg (format-python-exception ob_type ob_value ob_traceback))))
               (PyErr_Clear)
-              (error exc)))))
+              exc))))
+
+(defun pyerror (&optional place)
+  (error (make-python-exception place)))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
@@ -70,7 +73,7 @@ construct the \"msg\"."))
            (type symbol place))
   (if* (funcall checker res)
      then res
-     else (pyerror place)))
+     else (make-python-exception place)))
 
 (defmacro pycheckn (form &optional place)
   (let ((res (gensym "res"))

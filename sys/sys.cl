@@ -1,13 +1,22 @@
 ;;;; sys.cl
 (in-package :pycl.sys)
 
-;;; GIL
+;;; "lost and found"
+;;; these Python C APIS are not generated because they are not
+;;; considered to be "stable"
+(def-foreign-call PyObject_DelAttrString ((o (* PyObject)) (attr :foreign-address))
+  :returning :int
+  :arg-checking nil
+  :call-direct t
+  :allow-gc :always)
+
 (def-foreign-call (check-python-gil "PyGILState_Check") (:void)
   :returning :boolean
   :arg-checking nil
   :call-direct t
   :allow-gc :always)
 
+;;; GIL
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
   (declare (ignore safe))
@@ -42,17 +51,26 @@
       else (make-instance 'pyptr :foreign-address ,address
                                  :foreign-type 'PyObject)))
 
+(defun pyobject-pointer-p (thing)
+  (and (typep thing 'pyptr)
+       (eq 'PyObject (foreign-pointer-type thing))))
+
+(define-compiler-macro pyobject-pointer-p (thing)
+  `(and (typep ,thing 'pyptr)
+        (eq 'PyObject (foreign-pointer-type ,thing))))
+
+(deftype pyobject-pointer ()
+  '(satisfies pyobject-pointer-p))
+
 (defun pyobject-p (thing)
   "Test if thing is a VALID (non-null) python foreign pointer."
   (and (not (eq thing +pynull+))
-       (typep thing 'pyptr)
-       (eq 'PyObject (foreign-pointer-type thing))
+       (pyobject-pointer-p thing)
        (/= 0 (foreign-pointer-address thing))))
 
 (define-compiler-macro pyobject-p (thing)
   `(and (not (eq ,thing +pynull+))
-        (typep ,thing 'pyptr)
-        (eq 'PyObject (foreign-pointer-type ,thing))
+        (pyobject-pointer-p ,thing)
         (/= 0 (foreign-pointer-address ,thing))))
 
 (deftype pyobject ()
@@ -60,25 +78,23 @@
 
 (defun pynull (thing)
   (or (eq thing +pynull+)
-      (and (typep thing 'pyptr)
-           (eq 'PyObject (foreign-pointer-type thing))
+      (and (pyobject-pointer-p thing)
            (= 0 (foreign-pointer-address thing)))))
 
 (define-compiler-macro pynull (thing)
   `(or (eq ,thing +pynull+)
-       (and (typep ,thing 'pyptr)
-            (eq 'PyObject (foreign-pointer-type ,thing))
+       (and (pyobject-pointer-p ,thing)
             (= 0 (foreign-pointer-address ,thing)))))
 
 (defun pyobject-eq (x y)
-  (and (pyobject-p x)
-       (pyobject-p y)
+  (and (pyobject-pointer-p x)
+       (pyobject-pointer-p y)
        (= (foreign-pointer-address x)
           (foreign-pointer-address y))))
 
 (define-compiler-macro pyobject-eq (x y)
-  `(and (pyobject-p ,x)
-        (pyobject-p ,y)
+  `(and (pyobject-pointer-p ,x)
+        (pyobject-pointer-p ,y)
         (= (foreign-pointer-address ,x)
            (foreign-pointer-address ,y))))
 
