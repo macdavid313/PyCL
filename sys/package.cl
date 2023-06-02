@@ -53,6 +53,8 @@
    #:pydecref
    #:pydecref*
    #:pystealref
+   #:pymarkgc
+   #:pygc
    ;; -- python exception
    #:python-exception
    #:python-exception-type
@@ -61,5 +63,5 @@
    #:make-python-exception
    #:pyexcept
    #:pyerror
-   #:pychecn
+   #:pycheckn
    #:pycheckz))

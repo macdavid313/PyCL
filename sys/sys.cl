@@ -80,9 +80,6 @@
   (libpython      "" :type simple-string :read-only t)
   (home           "" :type simple-string :read-only t)
   ;; private slots start here ------------------------
-  ;; process lock, only available in SMP
-  #+smp (lock (mp:make-process-lock :name "python-process-lock")
-         :type mp:process-lock :read-only t)
   ;; Mapping between a symbol and the foreign address, e.g. 'PyExc_IOError ->
   ;; #x0000ffff
   (globalptr (make-hash-table :test 'eq :size #.(length +libpython-extern-variables+))
@@ -90,7 +87,17 @@
   ;; Mapping between a foreign address and the corresponding name as a symbol,
   ;; e.g. #x0000ffff -> 'PyExc_IOError
   (inv-globalptr (make-hash-table :test '= :size #.(length +libpython-extern-variables+))
-   :type hash-table :read-only t))
+   :type hash-table :read-only t)
+  ;; SMP only slots start here ---
+  ;; gc process
+  #+smp (gc-process nil :type mp:process)
+  ;; gc process gate
+  #+smp (gc-process-gate (mp:make-gate nil) :read-only t)
+  ;; gc invoking process gate
+  #+smp (gc-invoking-process-gate nil)
+  ;; garbage queue
+  #+smp (gc-queue (make-instance 'mp:queue :name "Python Garbage Queue")
+         :type mp:queue :read-only t))
 
 (defun print-python-struct (py stream depth)
   (declare (ignore depth))
@@ -135,17 +142,15 @@
   (let ((g (gensym "g"))
         (res (gensym "res")))
     (if* unwind-protect
-       then `(mp:with-process-lock ((python-lock *python*))
-               (let ((,g (PyGILState_Ensure))
-                     ,res)
-                 (declare (type (mod 1) ,g))
-                 (setq ,res (progn ,@body))
-                 (PyGILState_Release ,g)
-                 ,res))
-       else `(mp:with-process-lock ((python-lock *python*))
-               (let ((,g (PyGILState_Ensure)))
-                 (unwind-protect (progn ,@body)
-                   (PyGILState_Release ,g)))))))
+       then `(let ((,g (PyGILState_Ensure))
+                   ,res)
+               (declare (type (mod 1) ,g))
+               (setq ,res (progn ,@body))
+               (PyGILState_Release ,g)
+               ,res)
+       else `(let ((,g (PyGILState_Ensure)))
+               (unwind-protect (progn ,@body)
+                 (PyGILState_Release ,g))))))
 
 ;;; pyobject
 ;;; APIs and Utilities
@@ -186,6 +191,46 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
      then *pynull*
      else (prog1 (foreign-pointer-address ob)
             (setf (foreign-pointer-address ob) 0))))
+
+(defun pymarkgc (ob)
+  (when (typep ob 'pyobject)
+    (schedule-finalization ob 'pydecref :queue (python-gc-queue *python*)))
+  ob)
+
+(defun pygc (&key threshold)
+  (check-type *python* python)
+  (when (null (python-gc-process *python*))
+    (start-python-gc-process))
+  (flet ((run-gc ()
+           (let ((saved (PyEval_SaveThread)))
+             (unwind-protect
+                  (progn (setf (python-gc-invoking-process-gate *python*) (mp:make-gate nil))
+                         (mp:open-gate (python-gc-process-gate *python*))
+                         (mp:process-wait "wait for python gc finish"
+                                          'mp:gate-open-p (python-gc-invoking-process-gate *python*)))
+               (PyEval_RestoreThread saved)))))
+    (if* (typep threshold '(integer 0 *))
+       then (when (>= (mp:queue-length (python-gc-queue *python*))
+                      threshold)
+              (run-gc))
+       else (run-gc)))
+  (mp:queue-length (python-gc-queue *python*)))
+
+(defun start-python-gc-process ()
+  (flet ((process ()
+           (loop
+             (mp:process-wait "waiting for (pygc) is called"
+                              #'mp:gate-open-p (python-gc-process-gate *python*))
+             (let ((queue (python-gc-queue *python*)))
+               (when (not (mp:queue-empty-p queue))
+                 (with-python-gil (:unwind-protect nil)
+                   (loop for finalization = (mp:dequeue queue :wait nil)
+                         until (mp:queue-empty-p queue)
+                         do (call-finalizer finalization)))))
+             (mp:close-gate (python-gc-process-gate *python*))
+             (mp:open-gate (python-gc-invoking-process-gate *python*)))))
+    (setf (python-gc-process *python*)
+          (mp:process-run-function "python-gc-process" #'process))))
 
 ;;; python exception
 (define-condition python-exception (simple-pycl-error)

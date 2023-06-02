@@ -98,22 +98,19 @@ else:
   (let ((version (get-python-version python-exe))
         (libpython (ensure-libpython-loaded python-exe))
         (home (find-python-home python-exe)))
+    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
+          (sys:getenv "PYTHONHOME") home)
+    (Py_InitializeEx 0)                 ; Call 'Py_InitializeEx
     (setf *python*                      ; Initialize *python*
           (make-python :exe       python-exe
                        :version   version
                        :libpython libpython
                        :home      home))
-    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
-          (sys:getenv "PYTHONHOME") home)
-    (Py_InitializeEx 0)                 ; Call 'Py_InitializeEx
-    (unwind-protect (handler-case (startup)
-                      (error (err)
-                        (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
-                        (pystop :unload-libpython t)
-                        (error err)))
-      ;; clean up
-      (setf (sys:getenv "PYTHONIOENCODING") nil
-            (sys:getenv "PYTHONHOME") nil)))
+    (handler-case (startup)
+      (error (err)
+        (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
+        (pystop :unload-libpython t)
+        (error err))))
   *python*)
 
 (defun pystart (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
@@ -128,6 +125,8 @@ else:
   (when (python-p *python*)
     (when (= -1 (Py_FinalizeEx))
       (warn "(Py_FInalizedEx) returned -1"))
+    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
+          (sys:getenv "PYTHONHOME") nil)
     (when (and unload-libpython (python-libpython *python*))
       (format *debug-io* "Unloading libpython: ~s" (python-libpython *python*))
       (unload-foreign-library (python-libpython *python*)))

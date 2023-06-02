@@ -13,7 +13,6 @@
                    ;; start of pycl module
                    "pycl/package"
                    "pycl/init"
-                   "pycl/exception"
                    "pycl/objects"
                    ;; files list ends here
                    )))
