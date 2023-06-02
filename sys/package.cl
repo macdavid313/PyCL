@@ -22,7 +22,16 @@
    #:check-python-gil
    #:PyRun_SimpleString
    #:PyUnicode_AsUTF8
-   ;; --- GIL
+   ;; --- Python and its GIL
+   #:*python*
+   #:python
+   #:make-python
+   #:python-p
+   #:python-exe
+   #:python-version
+   #:python-libpython
+   #:python-home
+   #:python-lock
    #:with-python-gil
    ;; --- pyobject
    #:make-pyobject

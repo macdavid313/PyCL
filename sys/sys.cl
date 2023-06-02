@@ -28,7 +28,26 @@
   :call-direct t
   :allow-gc :always)
 
-;;; GIL
+;;; Python and its GIL
+(defstruct python
+  (exe           "" :type simple-string :read-only t)
+  (version       "" :type simple-string :read-only t)
+  (libpython     "" :type simple-string :read-only t)
+  (home          "" :type simple-string :read-only t)
+  #+smp (lock   nil :type (or null mp:process-lock)))
+
+(defmethod print-object ((py python) stream)
+  (with-slots (exe version libpython home) py
+    (print-unreadable-object (py stream :type t :identity t)
+      (terpri stream)
+      (with-stack-list (lines (string+ "  exe: "       #\" exe #\" )
+                              (string+ "  version: "   #\"  version #\")
+                              (string+ "  libpython: " #\" libpython #\")
+                              (string+ "  home: "      #\" home #\"))
+        (format stream "~{~a~^~%~}~%" lines)))))
+
+(defvar *python* nil "The default python interpreter instance.")
+
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
   (declare (ignore safe))
@@ -39,15 +58,17 @@
   (let ((g (gensym "g"))
         (res (gensym "res")))
     (if* unwind-protect
-       then `(let ((,g (PyGILState_Ensure))
-                   ,res)
-               (declare (type (mod 1) ,g))
-               (setq ,res (progn ,@body))
-               (PyGILState_Release ,g)
-               ,res)
-       else `(let ((,g (PyGILState_Ensure)))
-               (unwind-protect (progn ,@body)
-                 (PyGILState_Release))))))
+       then `(mp:with-process-lock ((python-lock *python*))
+               (let ((,g (PyGILState_Ensure))
+                     ,res)
+                 (declare (type (mod 1) ,g))
+                 (setq ,res (progn ,@body))
+                 (PyGILState_Release ,g)
+                 ,res))
+       else `(mp:with-process-lock ((python-lock *python*))
+               (let ((,g (PyGILState_Ensure)))
+                 (unwind-protect (progn ,@body)
+                   (PyGILState_Release ,g)))))))
 
 ;;; pyobject
 ;;; APIs and Utilities

@@ -9,14 +9,6 @@
         #:pycl.sys)
   (:export
    ;; init
-   #:*python*
-   #:python
-   #:python-p
-   #:python-libpython
-   #:python-exe
-   #:python-program
-   #:python-home
-   #:python-version
    #:pystart
    #:pystop
    ;; conditions

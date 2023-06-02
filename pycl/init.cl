@@ -1,57 +1,46 @@
 ;;;; init.cl
 (in-package #:pycl)
 
-(defvar *python* nil "The global python interpreter instance.")
-
-(defstruct python
-  (libpython     "" :type simple-string)
-  (exe           "" :type simple-string)
-  (program       "" :type simple-string)
-  (home          "" :type simple-string)
-  (version       "" :type simple-string))
-
-(defmethod print-object ((py python) stream)
-  (with-slots (libpython exe program home version) py
-    (print-unreadable-object (py stream :type t :identity t)
-      (with-stack-list (lines (string+ "libpython: "   libpython)
-                              (string+ "  exe:       " exe)
-                              (string+ "  program:   " program)
-                              (string+ "  home:      " home)
-                              (string+ "  version:   " version))
-        (format stream "~{~a~^~%~}~%" lines)))))
-
 (defconstant +minimum-python-version+ "3.7")
 
-(eval-when (:load-toplevel)
-  (defvar +find_libpython.py+
-    (let ((path (string+ (directory-namestring *load-pathname*) "find_libpython.py")))
+(defun get-python-version (python-exe)
+  (multiple-value-bind (version stderr exit)
+      (excl.osi:command-output (string+ python-exe #\Space "--version"))
+    (when (not (zerop exit))
+      (error "Cannot get the python version by running \"~a --version\":~%~a" python-exe stderr))
+    (let ((version (second (split-re " " (first version)))))
+      (destructuring-bind (major minor &rest others)
+          (split-re "\\." version)
+        (declare (ignore others))
+        (setq major (parse-integer major)
+              minor (parse-integer minor))
+        (cond ((= major 2) (error "Python 2 is not supported"))
+              ((<= minor 6) (error "Minimum python version: ~s, but got ~s from ~s"
+                                   +minimum-python-version+ version python-exe))
+              (t version))))))
+
+(eval-when (:load-toplevel :execute)
+  (defconstant +find_libpython.py+
+    (let ((path (string+ (directory-namestring (or *compile-file-pathname* *load-pathname*)) "find_libpython.py")))
       (when (not (probe-file path))
         (error "Missing file \"find_libpython.py\""))
-      path)))
+      path))
 
-(defun ensure-libpython-loaded (python-exe)
-  "Try to load libpython shared object by executing find_libpython.py.
+  (defun ensure-libpython-loaded (python-exe)
+    "Try to load libpython shared object by executing find_libpython.py.
 `python find_libpython.py --list-all` will return a list of candidates among
 which we will try to load one by one. If anything is loaded without raising an
 error, we will return the loaded libpython's pathname; otherwise, we raise an
 error."
-  (multiple-value-bind (candidates stderr exit)
-      (excl.osi:command-output (string+ python-exe #\Space +find_libpython.py+ #\Space "--list-all"))
-    (when (not (zerop exit))
-      (error "Cannot find libpython shared object by executing find_libpython.py:~%~a"
-             (apply 'string+ stderr)))
-    (dolist (lib candidates)
-      (when (ignore-errors (load lib :foreign t))
-        (return-from ensure-libpython-loaded lib)))
-    (error "Cannot load libpython shared object from these: ~a" candidates)))
-
-(defun find-python-program (python-exe)
-  (let ((script "import sys; print(sys.executable)"))
-    (multiple-value-bind (program stderr exit)
-        (excl.osi:command-output (string+ python-exe #\Space "-c" #\Space #\" script #\"))
+    (multiple-value-bind (candidates stderr exit)
+        (excl.osi:command-output (string+ python-exe #\Space +find_libpython.py+ #\Space "--list-all"))
       (when (not (zerop exit))
-        (error "Cannot get the python program name by running ~s:~%~a" script (apply 'string+ stderr)))
-      (first program))))
+        (error "Cannot find libpython shared object by executing find_libpython.py:~%~a"
+               (apply 'string+ stderr)))
+      (dolist (lib candidates)
+        (when (ignore-errors (load lib :foreign t))
+          (return-from ensure-libpython-loaded lib)))
+      (error "Cannot load libpython shared object from these: ~a" candidates))))
 
 (defun find-python-home (python-exe)
   (let ((script #+windows "
@@ -77,31 +66,6 @@ else:
       (when (not (zerop exit))
         (error "Cannot get the python home by running ~s:~%~a" script (apply 'string+ stderr)))
       (first home))))
-
-(defun get-python-version (python-exe)
-  (multiple-value-bind (version stderr exit)
-      (excl.osi:command-output (string+ python-exe #\Space "--version"))
-    (when (not (zerop exit))
-      (error "Cannot get the python version by running \"~a --version\":~%~a" python-exe stderr))
-    (let ((version (second (split-re " " (first version)))))
-      (destructuring-bind (major minor &rest others)
-          (split-re "\\." version)
-        (declare (ignore others))
-        (setq major (parse-integer major)
-              minor (parse-integer minor))
-        (cond ((= major 2) (error "Python 2 is not supported"))
-              ((<= minor 6) (error "Minimum python version: ~s, but got ~s from ~s"
-                                   +minimum-python-version+ version python-exe))
-              (t version))))))
-
-(defun init-python-program-name (program)
-  (with-native-string (program* program)
-    (let (w)
-      (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
-        (setq w (Py_DecodeLocale program* size*))
-        (when (zerop w)
-          (error "In 'init-python-program-name, error raise from calling Py_DecodeLocale"))
-        (Py_SetProgramName w)))))
 
 (defvar *python-global-raw-pointers* nil
   "A list of symbols that can be used to reference valid (non-null) global
@@ -203,21 +167,18 @@ for diagnostic purposes.")
     (error "*python* is non-nil. Is Python already started?"))
   (let ((version (get-python-version python-exe))
         (libpython (ensure-libpython-loaded python-exe))
-        (program (find-python-program python-exe))
         (home (find-python-home python-exe)))
     (setf *python*                      ; Initialize *python*
-          (make-python :libpython libpython
-                       :exe python-exe
-                       :program program
-                       :home home
-                       :version version))
-    (handler-case
-        (with-slots (home program) *python*
-          (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
-                (sys:getenv "PYTHONHOME") home)
-          (init-python-program-name program) ; Py_SetProgramName
-          (Py_InitializeEx 0)                ; Call 'Py_InitializeEx
-          (startup))
+          (make-python :exe       python-exe
+                       :version   version
+                       :libpython libpython
+                       :home      home))
+    #+smp (setf (python-lock *python*) (mp:make-process-lock :name "python-process-lock"))
+    (handler-case (progn
+                    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
+                          (sys:getenv "PYTHONHOME") (python-home *python*))
+                    (Py_InitializeEx 0) ; Call 'Py_InitializeEx
+                    (startup))
       (error (err)
         (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
         (pystop :unload-libpython t)
