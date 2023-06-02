@@ -75,11 +75,22 @@
   "The default python interpreter instance.")
 
 (defstruct (python (:print-function print-python-struct))
-  (exe           "" :type simple-string :read-only t)
-  (version       "" :type simple-string :read-only t)
-  (libpython     "" :type simple-string :read-only t)
-  (home          "" :type simple-string :read-only t)
-  #+smp (lock   nil :type (or null mp:process-lock)))
+  (exe            "" :type simple-string :read-only t)
+  (version        "" :type simple-string :read-only t)
+  (libpython      "" :type simple-string :read-only t)
+  (home           "" :type simple-string :read-only t)
+  ;; private slots start here ------------------------
+  ;; process lock, only available in SMP
+  #+smp (lock (mp:make-process-lock :name "python-process-lock")
+         :type mp:process-lock :read-only t)
+  ;; Mapping between a symbol and the foreign address, e.g. 'PyExc_IOError ->
+  ;; #x0000ffff
+  (globalptr (make-hash-table :test 'eq :size #.(length +libpython-extern-variables+))
+   :type hash-table :read-only t)
+  ;; Mapping between a foreign address and the corresponding name as a symbol,
+  ;; e.g. #x0000ffff -> 'PyExc_IOError
+  (inv-globalptr (make-hash-table :test '= :size #.(length +libpython-extern-variables+))
+   :type hash-table :read-only t))
 
 (defun print-python-struct (py stream depth)
   (declare (ignore depth))
@@ -91,6 +102,28 @@
                               (string+ "  libpython: " #\" libpython #\")
                               (string+ "  home: "      #\" home #\"))
         (format stream "~{~a~^~%~}~%" lines)))))
+
+(defun pyglobalptr (symbol-or-address)
+  (let ((k symbol-or-address))
+    (multiple-value-bind (val exists-p)
+        (etypecase symbol-or-address
+          (symbol (gethash k (python-globalptr *python*)))
+          (foreign-pointer (gethash (foreign-pointer-address k) (python-inv-globalptr *python*)))
+          ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k (python-inv-globalptr *python*))))
+      (when exists-p
+        (if (symbolp val) val (make-pyobject val))))))
+
+(defun (setf pyglobalptr) (new-addr sym)
+  (check-type sym symbol)
+  (check-type new-addr foreign-address)
+  (when (foreign-pointer-p new-addr) (setq new-addr (foreign-pointer-address new-addr)))
+  (multiple-value-bind (old-addr exists-p)
+      (gethash sym (python-globalptr *python*))
+    (when exists-p
+      (warn "Redefining python global pointer '~a from ~s to ~s" sym old-addr new-addr)
+      (remhash old-addr (python-inv-globalptr *python*))))
+  (setf (gethash sym (python-globalptr *python*)) new-addr
+        (gethash new-addr (python-inv-globalptr *python*)) sym))
 
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)

@@ -67,39 +67,6 @@ else:
         (error "Cannot get the python home by running ~s:~%~a" script (apply 'string+ stderr)))
       (first home))))
 
-(defvar *python-global-raw-pointers* nil
-  "A list of symbols that can be used to reference valid (non-null) global
-pointers processed from +libpython-extern-variables+. It is probably only useful
-for diagnostic purposes.")
-
-(defvar *global-raw-pointers-table* (make-hash-table :test 'eq)
-  "Mapping between a symbol and the foreign address, e.g. 'PyExc_IOError -> #x0000ffff")
-
-(defvar *global-raw-pointers-reverse-table* (make-hash-table :test '=)
-  "Mapping between a foreign address and the corresponding name as a symbol, e.g. #x0000ffff -> 'PyExc_IOError")
-
-(defun pyglobalptr (symbol-or-address)
-  (let ((k symbol-or-address))
-    (multiple-value-bind (val exists-p)
-        (etypecase symbol-or-address
-          (symbol (gethash k *global-raw-pointers-table*))
-          (foreign-pointer (gethash (foreign-pointer-address k) *global-raw-pointers-reverse-table*))
-          ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k *global-raw-pointers-reverse-table*)))
-      (if exists-p val nil))))
-
-(defun (setf pyglobalptr) (new-addr sym)
-  (check-type sym symbol)
-  (check-type new-addr foreign-address)
-  (when (foreign-pointer-p new-addr) (setq new-addr (foreign-pointer-address new-addr)))
-  (multiple-value-bind (old-addr exists-p)
-      (gethash sym *global-raw-pointers-table*)
-    (when exists-p
-      (warn "Redefining python global pointer '~a from ~s to ~s" sym old-addr new-addr)
-      (remhash old-addr *global-raw-pointers-reverse-table*)))
-  (pushnew sym *python-global-raw-pointers* :test 'eq)
-  (setf (gethash sym *global-raw-pointers-table*) new-addr
-        (gethash new-addr *global-raw-pointers-reverse-table*) sym))
-
 (defun defglobalptr-helper (name &key pointer-p)
   (let ((address (get-entry-point name))) ; entry address
     (when pointer-p     ; deref if tagged with :pointer e.g. (:pointer PyObject)
@@ -109,36 +76,6 @@ for diagnostic purposes.")
     (funcall
      `(lambda ()
         (setf (pyglobalptr ',(intern name)) ,address)))))
-
-(defun %load-traceback-module ()
-  (when (not #1=(pyglobalptr '%python-module/traceback%))
-    (let (ob_module)
-      (with-native-string (module "traceback" :external-format :utf-8)
-        (setq ob_module (PyImport_ImportModule module)))
-      (if* (pynull ob_module)
-         then (error "Cannot load 'traceback' module")
-         else (setf #1# ob_module))))
-  #1#)
-
-(defun %load-format-exception-callable ()
-  (when (not #1=(pyglobalptr '%python-callable/traceback.format_exception%))
-    (let (ob_callable)                  ; new
-      (with-native-string (str "format_exception" :external-format :utf-8)
-        (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
-      (if* (pynull ob_callable)
-         then (error "Cannot load 'format_exception' function from traceback module")
-         else (setf #1# ob_callable))))
-  #1#)
-
-(defun %load-format-exception-only-callable ()
-  (when (not #1=(pyglobalptr '%python-callable/traceback.format_exception_only%))
-    (let (ob_callable)                  ; new
-      (with-native-string (str "format_exception_only" :external-format :utf-8)
-        (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
-      (if* (pynull ob_callable)
-         then (error "Cannot load 'format_exception_only' function from traceback module")
-         else (setf #1# ob_callable))))
-  #1#)
 
 (defun startup ()
   "This function runs after a python instance has been successfully initialized."
@@ -152,13 +89,6 @@ for diagnostic purposes.")
   (setf (pyglobalptr 'Py_False)          (get-entry-point "_Py_FalseStruct"))
   (setf (pyglobalptr 'Py_True)           (get-entry-point "_Py_TrueStruct"))
   (setf (pyglobalptr 'Py_NotImplemented) (get-entry-point "_Py_NotImplementedStruct"))
-  ;; step 3: initialize pointers for
-  ;; ------- trackback module
-  ;; ------- trackback.format_exception
-  ;; ------- traceback.format_exception_only
-  (%load-traceback-module)
-  (%load-format-exception-callable)
-  (%load-format-exception-only-callable)
   ;; end of startup
   t)
 
@@ -173,16 +103,17 @@ for diagnostic purposes.")
                        :version   version
                        :libpython libpython
                        :home      home))
-    #+smp (setf (python-lock *python*) (mp:make-process-lock :name "python-process-lock"))
-    (handler-case (progn
-                    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
-                          (sys:getenv "PYTHONHOME") (python-home *python*))
-                    (Py_InitializeEx 0) ; Call 'Py_InitializeEx
-                    (startup))
-      (error (err)
-        (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
-        (pystop :unload-libpython t)
-        (error err))))
+    (setf (sys:getenv "PYTHONIOENCODING") "utf-8"
+          (sys:getenv "PYTHONHOME") home)
+    (Py_InitializeEx 0)                 ; Call 'Py_InitializeEx
+    (unwind-protect (handler-case (startup)
+                      (error (err)
+                        (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
+                        (pystop :unload-libpython t)
+                        (error err)))
+      ;; clean up
+      (setf (sys:getenv "PYTHONIOENCODING") nil
+            (sys:getenv "PYTHONHOME") nil)))
   *python*)
 
 (defun pystart (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
@@ -194,14 +125,10 @@ for diagnostic purposes.")
   (%start-python python-exe))
 
 (defun pystop (&key (unload-libpython t))
-  (when *python*
-    (ignore-errors (Py_FinalizeEx))     ; TODO: handle error value -1?
+  (when (python-p *python*)
+    (when (= -1 (Py_FinalizeEx))
+      (warn "(Py_FInalizedEx) returned -1"))
     (when (and unload-libpython (python-libpython *python*))
       (format *debug-io* "Unloading libpython: ~s" (python-libpython *python*))
       (unload-foreign-library (python-libpython *python*)))
-    (setf *python-global-raw-pointers* nil)
-    (clrhash *global-raw-pointers-table*)
-    (clrhash *global-raw-pointers-reverse-table*)
-    (setf *python* nil)
-    (setf (sys:getenv "PYTHONIOENCODING") nil
-          (sys:getenv "PYTHONHOME") nil)))
+    (setf *python* nil)))

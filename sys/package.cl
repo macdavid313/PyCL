@@ -43,7 +43,7 @@
    #:python-version
    #:python-libpython
    #:python-home
-   #+smp #:python-lock
+   #:pyglobalptr
    #:with-python-gil
    ;; --- pyobject
    ;; APIs and Utilities
