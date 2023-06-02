@@ -22,6 +22,12 @@
   :call-direct t
   :allow-gc :always)
 
+(def-foreign-call PyUnicode_AsUTF8 ((o (* PyObject)))
+  :returning :foreign-address
+  :arg-checking nil
+  :call-direct t
+  :allow-gc :always)
+
 ;;; GIL
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)

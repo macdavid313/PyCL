@@ -20,6 +20,8 @@
    ;; "lost and found"
    #:PyObject_DelAttrString
    #:check-python-gil
+   #:PyRun_SimpleString
+   #:PyUnicode_AsUTF8
    ;; --- GIL
    #:with-python-gil
    ;; --- pyobject
