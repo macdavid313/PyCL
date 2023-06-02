@@ -1,6 +1,7 @@
 ;;;; prelude.cl
 (in-package #:pycl.sys)
 
+;;; C typedefs
 (def-foreign-type Py_ssize_t :nat)
 (def-foreign-type Py_hash_t Py_ssize_t)
 (def-foreign-type Py_UCS4 :unsigned-int)
@@ -11,6 +12,7 @@
 (def-foreign-type PyThread_type_lock (* :void))
 (def-foreign-type PyOS_sighandler_t (* :void))
 
+;;; C enums
 (def-foreign-type PyLockStatus :int)
 (defconstant +PY_LOCK_FAILURE+ 0)
 (defconstant +PY_LOCK_ACQUIRED+ 1)
@@ -20,6 +22,7 @@
 (defconstant +PyGILState_LOCKED+ 0)
 (defconstant +PyGILState_UNLOCKED+ 1)
 
+;;; C structs
 (def-foreign-type PyObject
     (:struct
      (ob_refcnt Py_ssize_t)
@@ -102,36 +105,64 @@
      (flags :unsigned-int)
      (slots (* PyType_Slot))))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defclass pyptr (foreign-pointer)
-    ()
-    (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*"))
+;;; Lisp type definitions
+(defclass pyptr (foreign-pointer)
+  ()
+  (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*, PyModuleDef*"))
 
-  (when (not (boundp '+pynull+))
-    (defconstant +pynull+
-      (make-instance 'pyptr :foreign-type 'PyObject
-                            :foreign-address 0)
-      "A singleton that represents a NULL PyObject pointer"))
+(defun make-pyptr (ctype address)
+  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) address))
+  (check-type ctype (member PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef
+                            PyModuleDef_Base PyModuleDef_Slot PyModuleDef
+                            PyStructSequence_Field PyStructSequence_Desc
+                            PyType_Slot PyType_Spec))
+  (make-instance 'pyptr :foreign-type ctype
+                        :address address))
 
-  (defmethod print-object ((fp pyptr) stream)
-    (if* (= 0 (foreign-pointer-address fp))
-       then (format stream "#<~a NULL>" (foreign-pointer-type fp))
-       else (let ((*print-base* 16))
-              (format stream "#<~a @ #x~a>"
-                      (foreign-pointer-type fp)
-                      (foreign-pointer-address fp)))))
+(defmethod print-object ((fp pyptr) stream)
+  (if* (= 0 (foreign-pointer-address fp))
+     then (format stream "#<~a NULL>" (foreign-pointer-type fp))
+     else (let ((*print-base* 16))
+            (format stream "#<~a @ #x~a>"
+                    (foreign-pointer-type fp)
+                    (foreign-pointer-address fp)))))
 
-  (defun foreign-python-funcall-converter/returning (action address ctype ltype)
-    "Convert a foriegn address to a foreign pointer."
-    (declare (ignore ltype)
-             (type (unsigned-byte #+32bit 32 #+64bit 64) address)
-             (optimize (speed 3) (safety 0) (space 0)))
-    (case action
-      (:convert (if* (and (= 0 address) (eq 'PyObject (second ctype)))
-                   then +pynull+
-                   else (make-instance 'pyptr :foreign-address address
-                                              :foreign-type (second ctype))))
-      (:convert-type 'integer)
-      (:identify :return)
-      (:allocate nil)
-      (:will-allocate nil))))
+(defclass pyobject (pyptr)
+  ()
+  (:documentation "Foreign pointer type for PyObject."))
+
+(defmethod foreign-pointer-type ((fp pyobject)) 'PyObject)
+
+(defvar-nonbindable *pynull*
+    (make-instance 'pyobject :foreign-type 'PyObject
+                             :foreign-address 0)
+  "A singleton that represents a NULL PyObject pointer")
+
+(defun make-pyobject (address)
+  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) address))
+  (if* (= 0 address)
+     then *pynull*
+     else (make-instance 'pyobject :foreign-type 'PyObject
+                                   :foreign-address address)))
+
+(define-compiler-macro make-pyobject (address)
+  (let ((addr (gensym "addres")))
+    `(let ((,addr ,address))
+       (declare (type (unsigned-byte #+32bit 32 #+64bit 64) ,addr))
+       (if* (= 0 ,address)
+          then *pynull*
+          else (make-instance 'pyobject :foreign-type 'PyObject
+                                        :foreign-address ,addr)))))
+
+(defun foreign-python-funcall-converter/returning (action address ctype ltype)
+  (declare (ignore ltype)
+           (type (unsigned-byte #+32bit 32 #+64bit 64) address)
+           (optimize (speed 3) (safety 0) (space 0)))
+  (case action
+    (:convert (if* (eq 'PyObject (second ctype))
+                 then (make-pyobject address)
+                 else (make-pyptr (second ctype) address)))
+    (:convert-type 'integer)
+    (:identify :return)
+    (:allocate nil)
+    (:will-allocate nil)))

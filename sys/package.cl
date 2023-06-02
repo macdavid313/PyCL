@@ -13,15 +13,27 @@
    #:+PY_LOCK_INTR+
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
-   #:+pynull+
+   #:pyptr
+   #:make-pyptr
+   #:pyobject
+   #:*pynull*
+   #:make-pyobject
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
-   ;; "lost and found"
+   ;; --- "lost and found"
    #:PyObject_DelAttrString
    #:check-python-gil
    #:PyRun_SimpleString
-   #:PyUnicode_AsUTF8
+   #:from-pyunicode!
+   ;; --- Conditions
+   #:pycl-condition
+   #:report-pycl-condition
+   #:simple-pycl-error
+   ;; --- Utilities
+   #:pyimport!
+   #:pyhasattr!
+   #:pyattr!
    ;; --- Python and its GIL
    #:*python*
    #:python
@@ -31,19 +43,23 @@
    #:python-version
    #:python-libpython
    #:python-home
-   #:python-lock
+   #+smp #:python-lock
    #:with-python-gil
    ;; --- pyobject
-   #:make-pyobject
-   #:pyobject-pointer-p
-   #:pyobject-pointer
-   #:pyobject-p
-   #:pyobject
+   ;; APIs and Utilities
+   #:pyptr-eq
    #:pynull
-   #:pyobject-eq
    #:pyincref
    #:pydecref
    #:pydecref*
    #:pystealref
-   ;; --- conditions
-   #:pycl-condition))
+   ;; -- python exception
+   #:python-exception
+   #:python-exception-type
+   #:python-exception-msg
+   #:python-exception-occurred
+   #:make-python-exception
+   #:pyexcept
+   #:pyerror
+   #:pychecn
+   #:pycheckz))

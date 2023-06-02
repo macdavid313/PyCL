@@ -22,21 +22,67 @@
   :call-direct t
   :allow-gc :always)
 
-(def-foreign-call PyUnicode_AsUTF8 ((o (* PyObject)))
-  :returning :foreign-address
-  :arg-checking nil
-  :call-direct t
+(def-foreign-call (from-pyunicode! "PyUnicode_AsUTF8") ((o (* PyObject)))
+  :returning ((* :char) simple-string)
+  :arg-checking t
+  :strings-convert t
   :allow-gc :always)
 
+;;; Conditions
+(define-condition pycl-condition (condition)
+  ()
+  (:report report-pycl-condition))
+
+(defgeneric report-pycl-condition (condition stream)
+  (:documentation "Report pycl and python related conditions to stream."))
+
+(define-condition simple-pycl-error (pycl-condition simple-error)
+  ((msg :initarg :msg :initform "" :type simple-string)))
+
+(defmethod report-pycl-condition ((err simple-pycl-error) stream)
+  (with-slots (msg) err
+    (write-line msg stream)))
+
+;;; Utilities
+(defun pyimport! (module)
+  (declare (type simple-string module))
+  (with-native-string (str module :external-format :utf-8)
+    (the pyobject (PyImport_ImportModule str))))
+
+(defun pyhasattr! (ob attr)
+  (declare (type pyobject ob)
+           (type simple-string attr))
+  (with-native-string (str attr :external-format :utf-8)
+    (= 1 (PyObject_HasAttrString ob str))))
+
+(defun pyattr! (ob attr)
+  (declare (type pyobject ob)
+           (type simple-string attr))
+  (with-native-string (str attr :external-format :utf-8)
+    (values (PyObject_GetAttrString ob str)
+            (= 1 (PyObject_HasAttrString ob str)))))
+
+(defun (setf pyattr!) (new ob attr)
+  (declare (type pyobject ob new)
+           (type simple-string attr))
+  (with-native-string (str attr :external-format :utf-8)
+    (if* (and (pynull new) (pyhasattr! ob attr))
+       then (PyObject_DelAttrString ob str)
+       else (PyObject_SetAttrString ob str new))))
+
 ;;; Python and its GIL
-(defstruct python
+(defvar-nonbindable *python* nil
+  "The default python interpreter instance.")
+
+(defstruct (python (:print-function print-python-struct))
   (exe           "" :type simple-string :read-only t)
   (version       "" :type simple-string :read-only t)
   (libpython     "" :type simple-string :read-only t)
   (home          "" :type simple-string :read-only t)
   #+smp (lock   nil :type (or null mp:process-lock)))
 
-(defmethod print-object ((py python) stream)
+(defun print-python-struct (py stream depth)
+  (declare (ignore depth))
   (with-slots (exe version libpython home) py
     (print-unreadable-object (py stream :type t :identity t)
       (terpri stream)
@@ -45,8 +91,6 @@
                               (string+ "  libpython: " #\" libpython #\")
                               (string+ "  home: "      #\" home #\"))
         (format stream "~{~a~^~%~}~%" lines)))))
-
-(defvar *python* nil "The default python interpreter instance.")
 
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
@@ -72,111 +116,118 @@
 
 ;;; pyobject
 ;;; APIs and Utilities
-(defun make-pyobject (address)
-  (if* (= 0 address)
-     then +pynull+
-     else (make-instance 'pyptr :foreign-address address
-                                :foreign-type 'PyObject)))
-
-(define-compiler-macro make-pyobject (address)
-  `(if* (= 0 ,address)
-      then +pynull+
-      else (make-instance 'pyptr :foreign-address ,address
-                                 :foreign-type 'PyObject)))
-
-(defun pyobject-pointer-p (thing)
-  (and (typep thing 'pyptr)
-       (eq 'PyObject (foreign-pointer-type thing))))
-
-(define-compiler-macro pyobject-pointer-p (thing)
-  `(and (typep ,thing 'pyptr)
-        (eq 'PyObject (foreign-pointer-type ,thing))))
-
-(deftype pyobject-pointer ()
-  '(satisfies pyobject-pointer-p))
-
-(defun pyobject-p (thing)
-  "Test if thing is a VALID (non-null) python foreign pointer."
-  (and (not (eq thing +pynull+))
-       (pyobject-pointer-p thing)
-       (/= 0 (foreign-pointer-address thing))))
-
-(define-compiler-macro pyobject-p (thing)
-  `(and (not (eq ,thing +pynull+))
-        (pyobject-pointer-p ,thing)
-        (/= 0 (foreign-pointer-address ,thing))))
-
-(deftype pyobject ()
-  '(satisfies pyobject-p))
-
-(defun pynull (thing)
-  (or (eq thing +pynull+)
-      (and (pyobject-pointer-p thing)
-           (= 0 (foreign-pointer-address thing)))))
-
-(define-compiler-macro pynull (thing)
-  `(or (eq ,thing +pynull+)
-       (and (pyobject-pointer-p ,thing)
-            (= 0 (foreign-pointer-address ,thing)))))
-
-(defun pyobject-eq (x y)
-  (and (pyobject-pointer-p x)
-       (pyobject-pointer-p y)
+(defun pyptr-eq (x y)
+  (and (typep x 'foreign-python-pointer)
+       (typep y 'foreign-python-pointer)
+       (eq (foreign-pointer-type x) (foreign-pointer-type y))
        (= (foreign-pointer-address x)
           (foreign-pointer-address y))))
 
-(define-compiler-macro pyobject-eq (x y)
-  `(and (pyobject-pointer-p ,x)
-        (pyobject-pointer-p ,y)
-        (= (foreign-pointer-address ,x)
-           (foreign-pointer-address ,y))))
+(defun pynull (thing)
+  (or (eq thing *pynull*)
+      (and (typep thing 'pyptr)
+           (= 0 (foreign-pointer-address thing)))))
 
 (defun pyincref (ob)
-  (when (pyobject-p ob)
-    (Py_IncRef ob))
+  (declare (type pyobject ob))
+  (Py_IncRef ob)
   ob)
 
-(define-compiler-macro pyincref (ob)
-  `(progn (when (pyobject-p ,ob)
-            (Py_IncRef ,ob))
-          ,ob))
-
 (defun pydecref (ob)
-  (prog1 +pynull+
-    (when (pyobject-p ob)
-      (Py_DecRef ob)
-      (setf (foreign-pointer-address ob) 0))))
-
-(define-compiler-macro pydecref (ob)
-  `(prog1 +pynull+
-     (when (pyobject-p ,ob)
-       (Py_DecRef ,ob)
-       (setf (foreign-pointer-address ,ob) 0))))
+  (declare (type pyobject ob))
+  (Py_DecRef ob)
+  (setf (foreign-pointer-address ob) 0)
+  ob)
 
 (defun pydecref* (&rest obs)
   (dolist (ob obs nil)
-    (when (pyobject-p ob)
-      (Py_DecRef ob)
-      (setf (foreign-pointer-address ob) 0))))
-
-(define-compiler-macro pydecref* (&rest obs)
-  (flet ((transform (ob)
-           `(when (pyobject-p ,ob)
-              (Py_DecRef ,ob)
-              (setf (foreign-pointer-address ,ob) 0))))
-    `(progn ,@(mapcar #'transform obs)
-            nil)))
+    (declare (type pyobject ob))
+    (Py_DecRef ob)
+    (setf (foreign-pointer-address ob) 0)))
 
 (defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
 This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
-  (cond ((pyobject-p ob)
-         (prog1 (foreign-pointer-address ob)
-           (setf (foreign-pointer-address ob) 0)))
-        ((pynull ob)
-         +pynull+)
-        (t nil)))
+  (declare (type pyobject ob))
+  (if* (pynull ob)
+     then *pynull*
+     else (prog1 (foreign-pointer-address ob)
+            (setf (foreign-pointer-address ob) 0))))
 
-;;; Conditions
-(define-condition pycl-condition (condition)
-  ())
+;;; python exception
+(define-condition python-exception (simple-pycl-error)
+  ((type :initarg :type :initform nil :accessor python-exception-type :type (or null symbol))
+   (msg :initarg :msg :initform "" :accessor python-exception-msg :type simple-string))
+  (:documentation "A simple condition that represents a python exception. User is responsible to
+construct the \"msg\"."))
+
+(defmethod report-pycl-condition ((exc python-exception) stream)
+  (print-unreadable-object (exc stream :type t :identity t)
+    (with-slots (msg) exc
+      (format stream "- python exception caught: ~%~a" msg))))
+
+(define-symbol-macro python-exception-occurred
+    (not (pynull (PyErr_Occurred))))
+
+(defun make-python-exception ()
+  (if* python-exception-occurred
+     then (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
+                                 (ob_value* #1# :allocation :c)
+                                 (ob_traceback* #1# :allocation :c))
+            (PyErr_Fetch ob_type* ob_value* ob_traceback*)
+            (PyErr_NormalizeException ob_type* ob_value* ob_traceback*)
+            (let* ((ob_type (make-pyobject (fslot-value-typed #1# :c ob_type*)))
+                   (ob_value (make-pyobject (fslot-value-typed #1# :c ob_value*)))
+                   (ob_traceback (make-pyobject (fslot-value-typed #1# :c ob_traceback*)))
+                   (exc (make-instance 'python-exception
+                                       :type nil ; (pyglobalptr ob_type)
+                                       :msg (format-python-exception ob_type ob_value ob_traceback))))
+              (PyErr_Clear)
+              exc))
+          else (make-instance 'python-exception :msg "unknwon python exception")))
+
+(defun format-python-exception (ob_type       ; stolen
+                                ob_value      ; sotlen
+                                ob_traceback) ; stolen
+  (flet ((format-exception (ob)
+           (with-output-to-string (out)
+             (dotimes (idx (PyList_Size ob))
+               (let (ob_unicode         ; borrowed
+                     line)
+                 (setq ob_unicode (PyList_GetItem ob idx))
+                 (setq line (from-pyunicode! ob_unicode))
+                 (write-string (string+ #\Space #\Space line)
+                               out))))))
+    (let* ((ob_module (pyimport! "traceback")) ; new
+           (ob_formatter                       ; new
+             (if* (pynull ob_traceback)
+                then (pyattr! ob_module "format_exception_only")
+                else (pyattr! ob_module "format_exception")))
+           (ob_tuple (PyTuple_New (if (pynull ob_traceback) 2 3))) ; new
+           ob_list)                                                ; new
+      (if* (pynull ob_tuple)
+         then (prog1 "None"
+                (pydecref* ob_module ob_formatter ob_tuple))
+         else (PyTuple_SetItem ob_tuple 0 (pystealref ob_type))
+              (PyTuple_SetItem ob_tuple 1 (pystealref ob_value))
+              (when (not (pynull ob_traceback))
+                (PyTuple_SetItem ob_tuple 2 (pystealref ob_traceback)))
+              (setq ob_list (PyObject_CallObject ob_formatter ob_tuple))
+              (prog1 (format-exception ob_list)
+                (pydecref* ob_module ob_formatter ob_tuple ob_list))))))
+
+(defun pyexcept ()
+  (make-python-exception))
+
+(defun pyerror ()
+  (error (pyexcept)))
+
+(defun pycheckn (val)
+  (when (pynull val)
+    (pyerror))
+  val)
+
+(defun pycheckz (val)
+  (when (minusp val)
+    (pyerror))
+  val)
