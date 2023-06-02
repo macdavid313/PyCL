@@ -46,6 +46,4 @@
    #:pydecref*
    #:pystealref
    ;; --- conditions
-   #:pycl-condition
-   ;; --- utilities
-   #:pyunicode-to-native))
+   #:pycl-condition))

@@ -156,7 +156,7 @@
   (let ((ob_unicode (PyObject_Str ob)))
     (if* (pynull ob_unicode)
        then (pyerror)
-       else (unwind-protect (values (native-to-string (pyunicode-to-native ob_unicode)
+       else (unwind-protect (values (native-to-string (PyUnicode_AsUTF8 ob_unicode)
                                                       :external-format :utf-8))
               (pydecref ob_unicode)))))
 
@@ -164,7 +164,7 @@
   (let ((ob_unicode (PyObject_Repr ob)))
     (if* (pynull ob_unicode)
        then (pyerror)
-       else (unwind-protect (values (native-to-string (pyunicode-to-native ob_unicode)
+       else (unwind-protect (values (native-to-string (PyUnicode_AsUTF8 ob_unicode)
                                                       :external-format :utf-8))
               (pydecref ob_unicode)))))
 

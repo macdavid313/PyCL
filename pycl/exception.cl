@@ -38,7 +38,7 @@ construct the \"msg\"."))
                (let (ob_unicode         ; borrowed
                      bytes)
                  (setq ob_unicode (PyList_GetItem ob idx))
-                 (setq bytes (pyunicode-to-native ob_unicode))
+                 (setq bytes (PyUnicode_AsUTF8 ob_unicode))
                  (when (/= 0 bytes)
                    (write-string (string+ #\Space #\Space
                                           (native-to-string bytes :external-format :utf-8))
