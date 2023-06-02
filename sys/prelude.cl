@@ -138,21 +138,20 @@
                              :foreign-address 0)
   "A singleton that represents a NULL PyObject pointer")
 
-(defun make-pyobject (address)
-  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) address))
-  (if* (= 0 address)
-     then *pynull*
-     else (make-instance 'pyobject :foreign-type 'PyObject
-                                   :foreign-address address)))
-
-(define-compiler-macro make-pyobject (address)
-  (let ((addr (gensym "addres")))
-    `(let ((,addr ,address))
-       (declare (type (unsigned-byte #+32bit 32 #+64bit 64) ,addr))
-       (if* (= 0 ,address)
-          then *pynull*
-          else (make-instance 'pyobject :foreign-type 'PyObject
-                                        :foreign-address ,addr)))))
+(defun make-pyobject (x &optional subclass)
+  (declare (type (or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) x))
+  (etypecase x
+    ((unsigned-byte #+32bit 32 #+64bit 64)
+     (if* (= 0 x)
+        then *pynull*
+        else (make-instance (if subclass subclass 'pyobject)
+                            :foreign-type 'PyObject
+                            :foreign-address x)))
+    (pyobject (if* (pynull x)
+                 then *pynull*
+                 else (make-instance (if subclass subclass 'pyobject)
+                                     :foreign-type 'PyObject
+                                     :foreign-address (foreign-pointer-address x))))))
 
 (defun foreign-python-funcall-converter/returning (action address ctype ltype)
   (declare (ignore ltype)

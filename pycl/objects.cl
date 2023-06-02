@@ -8,38 +8,61 @@
 (defgeneric from-pyobject (ob)
   (:documentation "Default method for converting a PyObject pointer to a lisp value"))
 
+(defclass pynone (pyobject) ())
+(defclass pybool (pyobject) ())
+(defclass pylong (pyobject) ())
+(defclass pyfloat (pyobject) ())
+(defclass pycomplex (pyobject) ())
+(defclass pybytes (pyobject) ())
+(defclass pybytearray (pyobject) ())
+(defclass pyunicode (pyobject) ())
+(defclass pylist (pyobject) ())
+(defclass pytuple (pyobject) ())
+(defclass pydict (pyobject) ())
+
 (defun make-pynone ()
-  (make-pyobject (pyglobalptr 'Py_None)))
+  (make-pyobject (pyglobalptr 'Py_None) 'pynone))
 
 (defun make-pybool (x)
-  (make-pyobject (pyglobalptr (if x 'Py_True 'Py_False))))
+  (make-pyobject (pyglobalptr (if x 'Py_True 'Py_False)) 'pybool))
 
 (defun make-pylong (x)
-  (etypecase x
-    (unsigned-byte (PyLong_FromUnsignedLongLong x))
-    (integer (PyLong_FromLongLong x))
-    (real (PyLong_FromDouble (float x 0d0)))))
+  (make-pyobject (etypecase x
+                   (unsigned-byte (PyLong_FromUnsignedLongLong x))
+                   (integer (PyLong_FromLongLong x))
+                   (real (PyLong_FromDouble (float x 0d0))))
+                 'pylong))
 
 (defun make-pyfloat (x)
-  (PyFloat_FromDouble (float (the real x) 0d0)))
+  (make-pyobject (PyFloat_FromDouble (float (the real x) 0d0))
+                 'pyfloat))
 
 (defun make-pycomplex (x)
-  (PyComplex_FromDoubles (float (realpart x) 0d0)
-                         (float (imagpart x) 0d0)))
+  (make-pyobject (PyComplex_FromDoubles (float (realpart x) 0d0)
+                                        (float (imagpart x) 0d0))
+                 'pycomplex))
 
 (defun make-pybytes! (x)
   (with-native-string (str x :native-length-var len :external-format :utf-8)
-    (PyBytes_FromStringAndSize str len)))
+    (make-pyobject (PyBytes_FromStringAndSize str len) 'pybytes)))
 
 (defun make-pybytes (x)
   (etypecase x
     (array (make-pybytes! x))
     (list (make-pybytes! (coerce x '(simple-array (unsigned-byte 8) *))))))
 
+(defun make-pybytearray (x)
+  (etypecase x
+    (pyobject (pycheckn (PyByteArray_FromObject x)))
+    ((or string (array (unsigned-byte 8) (*)))
+     (with-native-string (str x :native-length-var len :external-format :utf-8)
+       (PyByteArray_FromStringAndSize str len)))))
+
 (defun make-pyunicode (x)
   (with-native-string (cstr x :native-length-var len
                               :external-format :utf-8)
-    (PyUnicode_FromStringAndSize cstr len)))
+    (make-pyobject (PyUnicode_FromStringAndSize cstr len)
+                   'pyunicode)))
 
 ;; (defun make-pylist! (lst)
 ;;   (let ((ob (PyList_New (length lst))))
@@ -128,36 +151,31 @@
 
 ;;; protocols
 (defun pytype-of (ob)
-  (let ((ob_type (PyObject_Type ob)))
-    (if* (pynull ob_type)
-       then (pyerror)
-       else (unwind-protect (pyglobalptr ob_type)
-              (pydecref ob_type)))))
+  (let ((ob_type (pycheckn (PyObject_Type ob))))
+    (unwind-protect (pyglobalptr ob_type)
+      (pydecref ob_type))))
 
 (defun pytypep (ob type)
-  (let ((res (PyObject_IsInstance ob (pyglobalptr type))))
+  (let ((res (etypecase type
+               (symbol (let ((ptr (pyglobalptr type)))
+                         (when ptr (PyObject_IsInstance ob (pyglobalptr type)))))
+               ((or pyptr (unsigned-byte #+32bit 32 #+64bit 64)) (PyObject_IsInstance ob type)))))
     (declare (type (integer -1 1) res))
-    (if* (= res -1)
-       then (pyerror)
-       else (= res 1))))
+    (= (pycheckz res) 1)))
 
 (defun pylen (ob)
   (check-type ob pyobject)
-  (PyObject_Length ob))
+  (pycheckz (PyObject_Length ob)))
 
 (defun pystr (ob)
-  (let ((ob_unicode (PyObject_Str ob)))
-    (if* (pynull ob_unicode)
-       then (pyerror)
-       else (unwind-protect (from-pyunicode! ob_unicode)
-              (pydecref ob_unicode)))))
+  (let ((ob_unicode (pycheckn (PyObject_Str ob))))
+    (unwind-protect (from-pyunicode! ob_unicode)
+      (pydecref ob_unicode))))
 
 (defun pyrepr (ob)
-  (let ((ob_unicode (PyObject_Repr ob)))
-    (if* (pynull ob_unicode)
-       then (pyerror)
-       else (unwind-protect (from-pyunicode! ob_unicode)
-              (pydecref ob_unicode)))))
+  (let ((ob_unicode (pycheckn (PyObject_Repr ob))))
+    (unwind-protect (from-pyunicode! ob_unicode)
+      (pydecref ob_unicode))))
 
 (defun check-args/pysequence-getter-setter (ob-seq idx)
   (check-type ob-seq pyobject)
@@ -188,7 +206,6 @@
   (assert (= 1 (PyMapping_Check ob)))
   (with-native-string (str key :external-format :utf-8)
     (= 1 (PyMapping_HasKeyString ob str))))
-
 
 (defun pymapping-get (ob key)
   (check-type ob pyobject)
