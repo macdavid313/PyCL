@@ -1,22 +1,32 @@
 ;;;; init.cl
 (in-package #:pycl)
 
-(define-condition start-python-error (pycl-condition error)
-  ((reason :initarg :reason :initform "" :type simple-string)))
+(defvar *python* nil "The global python interpreter instance.")
 
-(defmethod print-object ((err start-python-error) stream)
-  (format stream "Python Initialization FAILED!~%~a" (slot-value err 'reason)))
+(defstruct python
+  (libpython     "" :type simple-string)
+  (exe           "" :type simple-string)
+  (program       "" :type simple-string)
+  (home          "" :type simple-string)
+  (version       "" :type simple-string))
+
+(defmethod print-object ((py python) stream)
+  (with-slots (libpython exe program home version) py
+    (print-unreadable-object (py stream :type t :identity t)
+      (with-stack-list (lines (string+ "libpython: "   libpython)
+                              (string+ "  exe:       " exe)
+                              (string+ "  program:   " program)
+                              (string+ "  home:      " home)
+                              (string+ "  version:   " version))
+        (format stream "~{~a~^~%~}~%" lines)))))
 
 (defconstant +minimum-python-version+ "3.7")
 
-(defvar-nonbindable *python* nil
-  "A python interpreter instance.")
-
 (eval-when (:load-toplevel)
-  (defparameter *find_libpython.py*
+  (defvar +find_libpython.py+
     (let ((path (string+ (directory-namestring *load-pathname*) "find_libpython.py")))
       (when (not (probe-file path))
-        (error 'start-python-error :reason "Missing file \"find_libpython.py\""))
+        (error "Missing file \"find_libpython.py\""))
       path)))
 
 (defun ensure-libpython-loaded (python-exe)
@@ -26,25 +36,21 @@ which we will try to load one by one. If anything is loaded without raising an
 error, we will return the loaded libpython's pathname; otherwise, we raise an
 error."
   (multiple-value-bind (candidates stderr exit)
-      (excl.osi:command-output (string+ python-exe #\Space *find_libpython.py* #\Space "--list-all"))
+      (excl.osi:command-output (string+ python-exe #\Space +find_libpython.py+ #\Space "--list-all"))
     (when (not (zerop exit))
-      (error 'start-python-error
-             :reason (string+ "Cannot find libpython shared object by executing find_libpython.py:"
-                              #\Newline
-                              (apply 'string+ stderr))))
+      (error "Cannot find libpython shared object by executing find_libpython.py:~%~a"
+             (apply 'string+ stderr)))
     (dolist (lib candidates)
       (when (ignore-errors (load lib :foreign t))
         (return-from ensure-libpython-loaded lib)))
-    (error 'start-python-error
-           :reason (string+ "Cannot load libpython shared object from these: " candidates))))
+    (error "Cannot load libpython shared object from these: ~a" candidates)))
 
 (defun find-python-program (python-exe)
   (let ((script "import sys; print(sys.executable)"))
     (multiple-value-bind (program stderr exit)
         (excl.osi:command-output (string+ python-exe #\Space "-c" #\Space #\" script #\"))
       (when (not (zerop exit))
-        (error 'start-python-error
-               :reason (format nil "Cannot get the python program name by running ~s:~%~a" script stderr)))
+        (error "Cannot get the python program name by running ~s:~%~a" script (apply 'string+ stderr)))
       (first program))))
 
 (defun find-python-home (python-exe)
@@ -69,8 +75,7 @@ else:
     (multiple-value-bind (home stderr exit)
         (excl.osi:command-output (string+ python-exe #\Space "-c" #\Space #\" script #\"))
       (when (not (zerop exit))
-        (error 'start-python
-               :reason (format nil "Cannot get the python home by running ~s:~%~a" script stderr)))
+        (error "Cannot get the python home by running ~s:~%~a" script (apply 'string+ stderr)))
       (first home))))
 
 (defun get-python-version (python-exe)
@@ -84,28 +89,10 @@ else:
         (declare (ignore others))
         (setq major (parse-integer major)
               minor (parse-integer minor))
-        (cond ((= major 2) (error 'start-python-error :reason "Python 2 is not supported"))
-              ((<= minor 6) (error 'start-python-error
-                                   :reason (format nil "Minimum python version: ~s, but got ~s from ~s"
-                                                   +minimum-python-version+ version python-exe)))
+        (cond ((= major 2) (error "Python 2 is not supported"))
+              ((<= minor 6) (error "Minimum python version: ~s, but got ~s from ~s"
+                                   +minimum-python-version+ version python-exe))
               (t version))))))
-
-(defstruct python
-  (libpython     "" :type simple-string)
-  (exe           "" :type simple-string)
-  (program       "" :type simple-string)
-  (home          "" :type simple-string)
-  (version       "" :type simple-string))
-
-(defmethod print-object ((py python) stream)
-  (with-slots (libpython exe program home version) py
-    (print-unreadable-object (py stream :type t :identity t)
-      (with-stack-list (lines (string+ "libpython: "   libpython)
-                              (string+ "  exe:       " exe)
-                              (string+ "  program:   " program)
-                              (string+ "  home:      " home)
-                              (string+ "  version:   " version))
-        (format stream "~{~a~^~%~}~%" lines)))))
 
 (defun init-python-program-name (program)
   (with-native-string (program* program)
@@ -113,18 +100,18 @@ else:
       (with-static-fobjects ((size* (* :unsigned-nat) :allocation :c))
         (setq w (Py_DecodeLocale program* size*))
         (when (zerop w)
-          (error 'start-python-error :reason "In init-python-program-name, error raise from calling Py_DecodeLocale"))
+          (error "In 'init-python-program-name, error raise from calling Py_DecodeLocale"))
         (Py_SetProgramName w)))))
 
-(defvar-nonbindable *python-global-raw-pointers* nil
+(defvar *python-global-raw-pointers* nil
   "A list of symbols that can be used to reference valid (non-null) global
 pointers processed from +libpython-extern-variables+. It is probably only useful
 for diagnostic purposes.")
 
-(defvar-nonbindable *global-raw-pointers-table* (make-hash-table :test 'eq)
+(defvar *global-raw-pointers-table* (make-hash-table :test 'eq)
   "Mapping between a symbol and the foreign address, e.g. 'PyExc_IOError -> #x0000ffff")
 
-(defvar-nonbindable *global-raw-pointers-reverse-table* (make-hash-table :test '=)
+(defvar *global-raw-pointers-reverse-table* (make-hash-table :test '=)
   "Mapping between a foreign address and the corresponding name as a symbol, e.g. #x0000ffff -> 'PyExc_IOError")
 
 (defun pyglobalptr (symbol-or-address)
@@ -138,7 +125,7 @@ for diagnostic purposes.")
 
 (defun (setf pyglobalptr) (new-addr sym)
   (check-type sym symbol)
-  (check-type new-addr (or foreign-pointer (unsigned-byte #+32bit 32 #+64bit 64)))
+  (check-type new-addr foreign-address)
   (when (foreign-pointer-p new-addr) (setq new-addr (foreign-pointer-address new-addr)))
   (multiple-value-bind (old-addr exists-p)
       (gethash sym *global-raw-pointers-table*)
@@ -165,7 +152,7 @@ for diagnostic purposes.")
       (with-native-string (module "traceback" :external-format :utf-8)
         (setq ob_module (PyImport_ImportModule module)))
       (if* (pynull ob_module)
-         then (error 'start-python-error :reason "Cannot load 'traceback' module")
+         then (error "Cannot load 'traceback' module")
          else (setf #1# ob_module))))
   #1#)
 
@@ -175,7 +162,7 @@ for diagnostic purposes.")
       (with-native-string (str "format_exception" :external-format :utf-8)
         (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
       (if* (pynull ob_callable)
-         then (error 'start-python-error :reason "Cannot load 'format_exception' function from traceback module")
+         then (error "Cannot load 'format_exception' function from traceback module")
          else (setf #1# ob_callable))))
   #1#)
 
@@ -185,7 +172,7 @@ for diagnostic purposes.")
       (with-native-string (str "format_exception_only" :external-format :utf-8)
         (setq ob_callable (PyObject_GetAttrString (%load-traceback-module) str)))
       (if* (pynull ob_callable)
-         then (error 'start-python-error :reason "Cannot load 'format_exception_only' function from traceback module")
+         then (error "Cannot load 'format_exception_only' function from traceback module")
          else (setf #1# ob_callable))))
   #1#)
 
@@ -197,9 +184,10 @@ for diagnostic purposes.")
       (apply 'defglobalptr-helper spec)))
   ;; step 2: initialize Py_None, Py_False, and Py_True
   ;; they need to be defined separately because they are aliased
-  (setf (pyglobalptr 'Py_None)  (get-entry-point "_Py_NoneStruct"))
-  (setf (pyglobalptr 'Py_False) (get-entry-point "_Py_FalseStruct"))
-  (setf (pyglobalptr 'Py_True)  (get-entry-point "_Py_TrueStruct"))
+  (setf (pyglobalptr 'Py_None)           (get-entry-point "_Py_NoneStruct"))
+  (setf (pyglobalptr 'Py_False)          (get-entry-point "_Py_FalseStruct"))
+  (setf (pyglobalptr 'Py_True)           (get-entry-point "_Py_TrueStruct"))
+  (setf (pyglobalptr 'Py_NotImplemented) (get-entry-point "_Py_NotImplementedStruct"))
   ;; step 3: initialize pointers for
   ;; ------- trackback module
   ;; ------- trackback.format_exception
@@ -211,8 +199,8 @@ for diagnostic purposes.")
   t)
 
 (defun %start-python (python-exe)
-  (when *python*                        ; already initialized
-    (error 'start-python-error :reason "*python* is non-nil. Is Python already started?"))
+  (when (python-p *python*)             ; already initialized
+    (error "*python* is non-nil. Is Python already started?"))
   (let ((version (get-python-version python-exe))
         (libpython (ensure-libpython-loaded python-exe))
         (program (find-python-program python-exe))
@@ -233,21 +221,22 @@ for diagnostic purposes.")
       (error (err)
         (write-line "Error occured during calling '%start-python. Clean up and aboring ..." *debug-io*)
         (pystop :unload-libpython t)
-        (error 'start-python-error :reason (string+ err)))))
+        (error err))))
   *python*)
 
 (defun pystart (&optional (python-exe (or (sys:getenv "PYCL_PYTHON_EXE")
-                                               #+windows "python.exe"
-                                               #-windows "python")))
+                                          #+windows "python.exe"
+                                          #-windows "python")))
   (check-type python-exe simple-string)
   (when (not (probe-file python-exe))
-    (error 'start-python-error :reason (format nil "python-exe is not valid: ~s" python-exe)))
+    (error "python executable path is not valid: ~s" python-exe))
   (%start-python python-exe))
 
 (defun pystop (&key (unload-libpython t))
   (when *python*
     (ignore-errors (Py_FinalizeEx))     ; TODO: handle error value -1?
     (when (and unload-libpython (python-libpython *python*))
+      (format *debug-io* "Unloading libpython: ~s" (python-libpython *python*))
       (unload-foreign-library (python-libpython *python*)))
     (setf *python-global-raw-pointers* nil)
     (clrhash *global-raw-pointers-table*)
