@@ -163,20 +163,22 @@
 
 (defun pyincref (ob)
   (declare (type pyobject ob))
-  (Py_IncRef ob)
-  ob)
+  (when (typep ob 'pyobject)
+    (Py_IncRef ob)
+    ob))
 
 (defun pydecref (ob)
   (declare (type pyobject ob))
-  (Py_DecRef ob)
-  (setf (foreign-pointer-address ob) 0)
+  (when (typep ob 'pyobject)
+    (Py_DecRef ob)
+    (setf (foreign-pointer-address ob) 0))
   ob)
 
 (defun pydecref* (&rest obs)
-  (dolist (ob obs nil)
-    (declare (type pyobject ob))
-    (Py_DecRef ob)
-    (setf (foreign-pointer-address ob) 0)))
+  (dolist (ob obs)
+    (when (typep ob 'pyobject)
+      (Py_DecRef ob)
+      (setf (foreign-pointer-address ob) 0))))
 
 (defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
