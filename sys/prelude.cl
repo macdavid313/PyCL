@@ -110,21 +110,17 @@
   ()
   (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*, PyModuleDef*"))
 
-(defun make-pyptr (ctype address)
+(defun make-pyptr (address &optional ctype)
   (declare (type (unsigned-byte #+32bit 32 #+64bit 64) address))
-  (check-type ctype (member PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef
-                            PyModuleDef_Base PyModuleDef_Slot PyModuleDef
-                            PyStructSequence_Field PyStructSequence_Desc
-                            PyType_Slot PyType_Spec))
   (make-instance 'pyptr :foreign-type ctype
-                        :address address))
+                        :foreign-address address))
 
 (defmethod print-object ((fp pyptr) stream)
   (if* (= 0 (foreign-pointer-address fp))
-     then (format stream "#<~a NULL>" (foreign-pointer-type fp))
+     then (format stream "#<~a NULL>" (or (foreign-pointer-type fp) 'pyptr))
      else (let ((*print-base* 16))
             (format stream "#<~a @ #x~a>"
-                    (foreign-pointer-type fp)
+                    (or (foreign-pointer-type fp) 'pyptr)
                     (foreign-pointer-address fp)))))
 
 (defclass pyobject (pyptr)
@@ -138,28 +134,16 @@
                              :foreign-address 0)
   "A singleton that represents a NULL PyObject pointer")
 
-(defun make-pyobject (x &optional subclass)
-  (declare (type (or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) x))
-  (etypecase x
-    ((unsigned-byte #+32bit 32 #+64bit 64)
-     (if* (= 0 x)
-        then *pynull*
-        else (make-instance (if subclass subclass 'pyobject)
-                            :foreign-type 'PyObject
-                            :foreign-address x)))
-    (pyobject (if* (pynull x)
-                 then *pynull*
-                 else (make-instance (if subclass subclass 'pyobject)
-                                     :foreign-type 'PyObject
-                                     :foreign-address (foreign-pointer-address x))))))
-
 (defun foreign-python-funcall-converter/returning (action address ctype ltype)
   (declare (ignore ltype)
            (type (unsigned-byte #+32bit 32 #+64bit 64) address)
            (optimize (speed 3) (safety 0) (space 0)))
   (case action
     (:convert (if* (eq 'PyObject (second ctype))
-                 then (make-pyobject address)
+                 then (if* (= 0 address)
+                         then *pynull*
+                         else (make-instance 'pyobject :foreign-type 'PyObject
+                                                       :foreign-address address))
                  else (make-pyptr (second ctype) address)))
     (:convert-type 'integer)
     (:identify :return)

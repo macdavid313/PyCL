@@ -30,18 +30,16 @@
 
 ;;; Conditions
 (define-condition pycl-condition (condition)
-  ()
-  (:report report-pycl-condition))
-
-(defgeneric report-pycl-condition (condition stream)
-  (:documentation "Report pycl and python related conditions to stream."))
+  ())
 
 (define-condition simple-pycl-error (pycl-condition simple-error)
   ((msg :initarg :msg :initform "" :type simple-string)))
 
-(defmethod report-pycl-condition ((err simple-pycl-error) stream)
-  (with-slots (msg) err
-    (write-line msg stream)))
+(defmethod print-object ((err simple-pycl-error) stream)
+  (print-unreadable-object (err stream :type t :identity t)
+    (format stream "~%  ")
+    (with-slots (msg) err
+      (write-line msg stream))))
 
 ;;; Utilities
 (defun pyimport! (module)
@@ -112,25 +110,22 @@
 
 (defun pyglobalptr (symbol-or-address)
   (let ((k symbol-or-address))
-    (multiple-value-bind (val exists-p)
-        (etypecase symbol-or-address
-          (symbol (gethash k (python-globalptr *python*)))
-          (foreign-pointer (gethash (foreign-pointer-address k) (python-inv-globalptr *python*)))
-          ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k (python-inv-globalptr *python*))))
-      (when exists-p
-        (if (symbolp val) val (make-pyobject val))))))
+    (typecase symbol-or-address
+      (symbol (gethash k (python-globalptr *python*)))
+      ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k (python-inv-globalptr *python*)))
+      (foreign-pointer (gethash (foreign-pointer-address k) (python-inv-globalptr *python*)))
+      (t nil))))
 
 (defun (setf pyglobalptr) (new-addr sym)
-  (check-type sym symbol)
-  (check-type new-addr foreign-address)
-  (when (foreign-pointer-p new-addr) (setq new-addr (foreign-pointer-address new-addr)))
-  (multiple-value-bind (old-addr exists-p)
-      (gethash sym (python-globalptr *python*))
-    (when exists-p
-      (warn "Redefining python global pointer '~a from ~s to ~s" sym old-addr new-addr)
-      (remhash old-addr (python-inv-globalptr *python*))))
-  (setf (gethash sym (python-globalptr *python*)) new-addr
-        (gethash new-addr (python-inv-globalptr *python*)) sym))
+  (when (and (symbolp sym)
+             (typep new-addr '(unsigned-byte #+32bit 32 #+64bit 64)))
+    (multiple-value-bind (old-addr exists-p)
+        (gethash sym (python-globalptr *python*))
+      (when exists-p
+        (warn "Redefining python global pointer '~a from ~s to ~s" sym old-addr new-addr)
+        (remhash old-addr (python-inv-globalptr *python*))))
+    (setf (gethash sym (python-globalptr *python*)) new-addr
+          (gethash new-addr (python-inv-globalptr *python*)) sym)))
 
 #-smp
 (defmacro with-python-gil ((&key safe) &body body)
@@ -239,7 +234,7 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
   (:documentation "A simple condition that represents a python exception. User is responsible to
 construct the \"msg\"."))
 
-(defmethod report-pycl-condition ((exc python-exception) stream)
+(defmethod print-object ((exc python-exception) stream)
   (print-unreadable-object (exc stream :type t :identity t)
     (with-slots (msg) exc
       (format stream "- python exception caught: ~%~a" msg))))
@@ -254,15 +249,15 @@ construct the \"msg\"."))
                                  (ob_traceback* #1# :allocation :c))
             (PyErr_Fetch ob_type* ob_value* ob_traceback*)
             (PyErr_NormalizeException ob_type* ob_value* ob_traceback*)
-            (let* ((ob_type (make-pyobject (fslot-value-typed #1# :c ob_type*)))
-                   (ob_value (make-pyobject (fslot-value-typed #1# :c ob_value*)))
-                   (ob_traceback (make-pyobject (fslot-value-typed #1# :c ob_traceback*)))
-                   (exc (make-instance 'python-exception
-                                       :type nil ; (pyglobalptr ob_type)
-                                       :msg (format-python-exception ob_type ob_value ob_traceback))))
-              (PyErr_Clear)
-              exc))
-          else (make-instance 'python-exception :msg "unknwon python exception")))
+            (let ((ob_type (fslot-value-typed #1# :c ob_type*))
+                  (ob_value (fslot-value-typed #1# :c ob_value*))
+                  (ob_traceback (fslot-value-typed #1# :c ob_traceback*)))
+              (prog1 (make-instance 'python-exception
+                                    :type (pyglobalptr ob_type)
+                                    :msg (format-python-exception ob_type ob_value ob_traceback))
+                (PyErr_Clear))))
+     else (make-instance 'simple-pycl-error
+                          :msg "trying to catch a python exception but none has occurred")))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
@@ -278,18 +273,18 @@ construct the \"msg\"."))
                                out))))))
     (let* ((ob_module (pyimport! "traceback")) ; new
            (ob_formatter                       ; new
-             (if* (pynull ob_traceback)
+             (if* (= 0 ob_traceback)
                 then (pyattr! ob_module "format_exception_only")
                 else (pyattr! ob_module "format_exception")))
-           (ob_tuple (PyTuple_New (if (pynull ob_traceback) 2 3))) ; new
-           ob_list)                                                ; new
+           (ob_tuple (PyTuple_New (if (= 0 ob_traceback) 2 3))) ; new
+           ob_list)                                             ; new
       (if* (pynull ob_tuple)
          then (prog1 "None"
                 (pydecref* ob_module ob_formatter ob_tuple))
-         else (PyTuple_SetItem ob_tuple 0 (pystealref ob_type))
-              (PyTuple_SetItem ob_tuple 1 (pystealref ob_value))
-              (when (not (pynull ob_traceback))
-                (PyTuple_SetItem ob_tuple 2 (pystealref ob_traceback)))
+         else (PyTuple_SetItem ob_tuple 0 ob_type)
+              (PyTuple_SetItem ob_tuple 1 ob_value)
+              (when (/= 0 ob_traceback)
+                (PyTuple_SetItem ob_tuple 2 ob_traceback))
               (setq ob_list (PyObject_CallObject ob_formatter ob_tuple))
               (prog1 (format-exception ob_list)
                 (pydecref* ob_module ob_formatter ob_tuple ob_list))))))
@@ -301,11 +296,11 @@ construct the \"msg\"."))
   (error (pyexcept)))
 
 (defun pycheckn (val)
-  (when (pynull val)
-    (pyerror))
-  val)
+  (if* (pynull val)
+     then (values *pynull* (pyexcept))
+     else (values val nil)))
 
 (defun pycheckz (val)
-  (when (minusp val)
-    (pyerror))
-  val)
+  (if* (= -1 (minusp val))
+     then (values *pynull* (pyexcept))
+     else (values val nil)))

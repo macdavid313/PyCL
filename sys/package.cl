@@ -14,10 +14,8 @@
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
    #:pyptr
-   #:make-pyptr
    #:pyobject
    #:*pynull*
-   #:make-pyobject
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
@@ -28,7 +26,6 @@
    #:from-pyunicode!
    ;; --- Conditions
    #:pycl-condition
-   #:report-pycl-condition
    #:simple-pycl-error
    ;; --- Utilities
    #:pyimport!
