@@ -1,11 +1,38 @@
 ;;;; objects.cl
 (in-package #:pycl)
 
+(define-condition pyobject-conversion-error (simple-pycl-error)
+  ())
+
+(defun make-pyobject-conversion-error (&key from to)
+  (make-instance 'pyobject-conversion-error
+                 :msg (cond ((and from (null to))
+                             (format nil "don't know how to convert ~a to pyobject" from))
+                            ((and (null from) to)
+                             (format nil "don't know how to convert a pyobject to ~a" to))
+                            (t (format nil "don't know to convert ~a to ~a" from to)))))
+
+(defun make-pyobject (x &optional subclass)
+  (declare (type (or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) x))
+  (etypecase x
+    ((unsigned-byte #+32bit 32 #+64bit 64)
+     (if* (= 0 x)
+        then *pynull*
+        else (make-instance (if subclass subclass 'pyobject)
+                            :foreign-type 'PyObject
+                            :foreign-address x)))
+    (pyobject (if* (pynull x)
+                 then *pynull*
+                 else (make-instance (if subclass subclass 'pyobject)
+                                     :foreign-type 'PyObject
+                                     :foreign-address (foreign-pointer-address x))))))
+
 (defgeneric to-pyobject (thing)
   (:documentation "Default method for converting a lisp value to a PyObject pointer")
+  (:method (thing) (values *pynull* (make-pyobject-conversion-error :from thing)))
   (:method ((fp pyobject)) fp))
 
-(defgeneric from-pyobject (ob)
+(defgeneric from-pyobject (ob output-type-spec)
   (:documentation "Default method for converting a PyObject pointer to a lisp value"))
 
 (defclass pynone (pyobject) ())
@@ -24,91 +51,140 @@
   (make-pyobject (pyglobalptr 'Py_None) 'pynone))
 
 (defun make-pybool (x)
-  (make-pyobject (pyglobalptr (if x 'Py_True 'Py_False)) 'pybool))
+  (make-pyobject (pyglobalptr (if x 'Py_True 'Py_False))
+                 'pybool))
 
 (defun make-pylong (x)
-  (make-pyobject (etypecase x
-                   (unsigned-byte (PyLong_FromUnsignedLongLong x))
-                   (integer (PyLong_FromLongLong x))
-                   (real (PyLong_FromDouble (float x 0d0))))
-                 'pylong))
+  (flet ((convert! (x)
+           (declare (type real x))
+           (typecase x
+             (unsigned-byte (PyLong_FromUnsignedLongLong x))
+             (integer (PyLong_FromLongLong x))
+             (t (PyLong_FromDouble (float x 0d0))))))
+    (if* (realp x)
+       then (pycheckn (make-pyobject (convert! x) 'pylong))
+       else (values *pynull* nil))))
 
 (defun make-pyfloat (x)
-  (make-pyobject (PyFloat_FromDouble (float (the real x) 0d0))
-                 'pyfloat))
+  (if* (realp x)
+     then (pycheckn
+           (make-pyobject (PyFloat_FromDouble (float (the real x) 0d0))
+                          'pyfloat))
+     else (values *pynull* nil)))
 
 (defun make-pycomplex (x)
-  (make-pyobject (PyComplex_FromDoubles (float (realpart x) 0d0)
-                                        (float (imagpart x) 0d0))
-                 'pycomplex))
-
-(defun make-pybytes! (x)
-  (with-native-string (str x :native-length-var len :external-format :utf-8)
-    (make-pyobject (PyBytes_FromStringAndSize str len) 'pybytes)))
+  (if* (complexp x)
+     then (pycheckn
+           (make-pyobject (PyComplex_FromDoubles (float (realpart x) 0d0)
+                                                 (float (imagpart x) 0d0))
+                          'pycomplex))
+     else (values *pynull* nil)))
 
 (defun make-pybytes (x)
-  (etypecase x
-    (array (make-pybytes! x))
-    (list (make-pybytes! (coerce x '(simple-array (unsigned-byte 8) *))))))
+  (flet ((convert! (x)
+           (with-native-string (str x :native-length-var len :external-format :utf-8)
+             (make-pyobject (PyBytes_FromStringAndSize str len) 'pybytes))))
+    (typecase x
+      ((or simple-string (simple-array (unsigned-byte 8) (*)))
+       (convert! x))
+      (list
+       (make-pybytes (ignore-errors (coerce x '(simple-array (unsigned-byte 8) (*))))))
+      (t
+       (values *pynull* nil)))))
 
 (defun make-pybytearray (x)
-  (etypecase x
+  (declare (type (or pyobject
+                     simple-string
+                     (simple-array (unsigned-byte 8) (*)))
+                 x))
+  (typecase x
     (pyobject (pycheckn (PyByteArray_FromObject x)))
-    ((or string (array (unsigned-byte 8) (*)))
+    ((or simple-string
+         (simple-array (unsigned-byte 8) (*)))
      (with-native-string (str x :native-length-var len :external-format :utf-8)
-       (PyByteArray_FromStringAndSize str len)))))
+       (pycheckn (PyByteArray_FromStringAndSize str len))))
+    (t (values *pynull* nil))))
 
 (defun make-pyunicode (x)
-  (with-native-string (cstr x :native-length-var len
-                              :external-format :utf-8)
-    (make-pyobject (PyUnicode_FromStringAndSize cstr len)
-                   'pyunicode)))
+  (if* (or (stringp x)
+           (typep x '(simple-array (unsigned-byte 8) (*))))
+     then  (with-native-string (cstr x :native-length-var len
+                                       :external-format :utf-8)
+             (pycheckn
+              (make-pyobject (PyUnicode_FromStringAndSize cstr len)
+                             'pyunicode)))
+     else (values *pynull* nil)))
 
-;; (defun make-pylist! (lst)
-;;   (let ((ob (PyList_New (length lst))))
-;;     (check-type ob pyobject)
-;;     (loop for item in lst
-;;           for idx from 0
-;;           do (PyList_SetItem ob idx (pystealref item)))
-;;     ob))
+(defun make-pytuple (x)
+  (flet ((convert! (obs)
+           (let ((ob-tuple (PyTuple_New (length obs))))
+             (if* (pynull ob-tuple)
+                then (values *pynull* (pyexcept))
+                else (loop for ob in obs
+                           for idx from 0
+                           do (PyTuple_SetItem ob-tuple idx (pystealref ob)))
+                     (make-pyobject ob-tuple 'pytuple)))))
+    (typecase x
+      (list (loop with obs = (list)
+                  for val in x
+                  do (multiple-value-bind (ob exception)
+                         (to-pyobject val)
+                       (if* exception
+                          then (dolist (ob obs) (pydecref ob))
+                               (return-from make-pytuple (values *pynull* exception))
+                          else (push ob obs)))
+                  finally (return (convert! (nreverse obs)))))
+      (array (loop with obs = (list)
+                   for idx from 0 below (length x)
+                   do (multiple-value-bind (ob exception)
+                          (to-pyobject (aref x idx))
+                        (if* exception
+                           then (dolist (ob obs) (pydecref ob))
+                                (return-from make-pytuple (values *pynull* exception))
+                           else (push ob obs)))
+                   finally (return (convert! (nreverse obs)))))
+      (t (values *pynull* (make-pyobject-conversion-error :from x :to 'pytuple))))))
 
-;; (defmethod @pylist ((x list))
-;;   (with-stack-list (ob-stack)
-;;     (handler-case (dolist (elm x)
-;;                     (push (to-pyobject elm) ob-stack))
-;;       (error (e)
-;;         (dolist (ob ob-stack)
-;;           (pydecref ob))
-;;         (error e)))
-;;     (make-pylist-unsafe! (nreverse ob-stack))))
+(defun make-pylist (x)
+  (flet ((convert! (obs)
+           (let ((ob-list (PyList_New (length obs))))
+             (if* (pynull ob-list)
+                then (values *pynull* (pyexcept))
+                else (loop for ob in obs
+                           for idx from 0
+                           do (PyList_SetItem ob-list idx (pystealref ob)))
+                     (make-pyobject ob-list 'pylist)))))
+    (typecase x
+      (list (loop with obs = (list)
+                  for val in x
+                  do (multiple-value-bind (ob exception)
+                         (to-pyobject val)
+                       (if* exception
+                          then (dolist (ob obs) (pydecref ob))
+                               (return-from make-pylist (values *pynull* exception))
+                          else (push ob obs)))
+                  finally (return (convert! (nreverse obs)))))
+      (array (loop with obs = (list)
+                   for idx from 0 below (length x)
+                   do (multiple-value-bind (ob exception)
+                          (to-pyobject (aref x idx))
+                        (if* exception
+                           then (dolist (ob obs) (pydecref ob))
+                                (return-from make-pylist (values *pynull* exception))
+                           else (push ob obs)))
+                   finally (return (convert! (nreverse obs)))))
+      (t (values *pynull* (make-pyobject-conversion-error :from x :to 'pylist))))))
 
-;; (defmethod @pylist ((x array))
-;;   (let (ob-stack)
-;;     (handler-case (loop for idx from 0 below (length x)
-;;                         do (push (to-pyobject (aref x idx)) ob-stack))
-;;       (error (e)
-;;         (dolist (ob ob-stack)
-;;           (pydecref ob))
-;;         (error e)))
-;;     (make-pylist-unsafe! (nreverse ob-stack))))
-
-;; (defmethod @pytuple (x)
-;;   (etypecase x
-;;     ((or list array)
-;;      (let ((ob_list (@pylist x))
-;;            ob_tuple)
-;;        (setq ob_tuple (PySequence_Tuple ob_list))
-;;        (prog1 ob_tuple
-;;          (pydecref ob_list))))))
-
-;; (defun make-pydict-unsafe! (ht)
+;; (defun make-pydict! (ht)
 ;;   (let ((ob (PyDict_New)))
-;;     (check-type ob pyobject)
-;;     (flet ((iter (k v)
-;;              (with-native-string (str k :external-format :utf-8)
-;;                (PyDict_SetItemString ob str v))))
-;;       (maphash #'iter ht))
-;;     ob))
+;;     (pycheckn ob)
+;;     (with-hash-table-iterator (next ht)
+;;       (while ()
+;;         (multiple-value-bind (more? k v) (next)
+;;           (if* more?
+;;              then (with-native-string (str k :external-format :utf-8)
+;;                     (PyDict_SetItemString ob str v))
+;;              else (return ob)))))))
 
 ;; (defmethod @pydict ((x hash-table))
 ;;   (with-stack-list (ob-stack)
@@ -144,8 +220,8 @@
 (defmethod to-pyobject ((x ratio))      (make-pyfloat x))
 (defmethod to-pyobject ((x float))      (make-pyfloat x))
 (defmethod to-pyobject ((x complex))    (make-pycomplex x))
-;; (defmethod to-pyobject ((x list))       (make-pylist x))
-;; (defmethod to-pyobject ((x array))      (make-pylist x))
+(defmethod to-pyobject ((x list))       (make-pylist x))
+(defmethod to-pyobject ((x array))      (make-pylist x))
 (defmethod to-pyobject ((x string))     (make-pyunicode x))
 ;; (defmethod to-pyobject ((x hash-table)) (make-pydict x))
 
