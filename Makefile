@@ -18,7 +18,7 @@ ifndef LISP
 	$(error LISP is not set)
 endif
 	@if [ ! -f "sys/capi.cl" ]; then echo "Please run 'make sys/capi.cl'" && exit 1; fi;
-	$(LISP) -W -L pkg.cl -e '(build-pycl)' --kill
+	$(LISP) -W -L pkg.cl -e '(pycl.pkg:build-pycl)' --kill
 
 find_libpython.py:
 	cp pycl/find_libpython.py ./

@@ -1,7 +1,14 @@
 ;;;; pkg.cl
 (in-package #:cl-user)
 
-(use-package 'util.string)
+(defpackage #:pycl.pkg
+  (:use #:cl
+        #:excl
+        #:util.string)
+  (:export #:compile-and-load-pycl
+           #:build-pycl))
+
+(in-package #:pycl.pkg)
 
 (eval-when (:load-toplevel :execute)
   (defparameter *pycl-src-files*
@@ -24,16 +31,14 @@
     (string+ (directory-namestring *load-pathname*) "pycl.fasl")))
 
 (defun compile-and-load-pycl ()
-  (let (fasls)
-    (dolist (file *pycl-src-files*)
-      (push (compile-file (string+ file ".cl")
-                          :load-after-compile t)
-            fasls))
-    (nreverse fasls)))
+  (dolist (file *pycl-src-files*)
+    (compile-file (string+ file ".cl")
+                  :load-after-compile t)))
 
 (defun build-pycl ()
+  (compile-and-load-pycl)
   (with-open-file (out *pycl-fasl-output* :direction :output
                                           :if-exists :supersede
                                           :if-does-not-exist :create)
-    (dolist (fasl (compile-and-load-pycl))
-      (sys:copy-file fasl out))))
+    (dolist (file *pycl-src-files*)
+      (sys:copy-file (string+ file ".fasl") out))))
