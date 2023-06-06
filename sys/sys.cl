@@ -128,8 +128,8 @@
           (gethash new-addr (python-inv-globalptr *python*)) sym)))
 
 #-smp
-(defmacro with-python-gil ((&key safe) &body body)
-  (declare (ignore safe))
+(defmacro with-python-gil ((&key (unwind-protect t)) &body body)
+  (declare (ignore unwind-protect))
   `(progn ,@body))
 
 #+smp
@@ -189,11 +189,13 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
      else (prog1 (foreign-pointer-address ob)
             (setf (foreign-pointer-address ob) 0))))
 
+#+smp
 (defun pymarkgc (ob)
   (when (typep ob 'pyobject)
     (schedule-finalization ob 'pydecref :queue (python-gc-queue *python*)))
   ob)
 
+#+smp
 (defun pygc (&key threshold)
   (check-type *python* python)
   (when (null (python-gc-process *python*))
@@ -213,6 +215,7 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
        else (run-gc)))
   (mp:queue-length (python-gc-queue *python*)))
 
+#+smp
 (defun start-python-gc-process ()
   (flet ((process ()
            (loop
