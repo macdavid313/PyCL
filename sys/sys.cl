@@ -70,7 +70,7 @@
 
 ;;; Python and its GIL
 (defvar-nonbindable *python* nil
-  "The default python interpreter instance.")
+  "The global python interpreter instance.")
 
 (defstruct (python (:print-function print-python-struct))
   (exe            "" :type simple-string :read-only t)
