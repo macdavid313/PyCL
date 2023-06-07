@@ -22,9 +22,9 @@
   :call-direct t
   :allow-gc :always)
 
-(def-foreign-call (from-pyunicode! "PyUnicode_AsUTF8") ((o (* PyObject)))
+(def-foreign-call (pyunicode-to-string "PyUnicode_AsUTF8") ((o (* PyObject)))
   :returning ((* :char) simple-string)
-  :arg-checking t
+  :arg-checking nil
   :strings-convert t
   :allow-gc :always)
 
@@ -85,17 +85,7 @@
   ;; Mapping between a foreign address and the corresponding name as a symbol,
   ;; e.g. #x0000ffff -> 'PyExc_IOError
   (inv-globalptr (make-hash-table :test '= :size #.(length +libpython-extern-variables+))
-   :type hash-table :read-only t)
-  ;; SMP only slots start here ---
-  ;; gc process
-  #+smp (gc-process nil :type mp:process)
-  ;; gc process gate
-  #+smp (gc-process-gate (mp:make-gate nil) :read-only t)
-  ;; gc invoking process gate
-  #+smp (gc-invoking-process-gate nil)
-  ;; garbage queue
-  #+smp (gc-queue (make-instance 'mp:queue :name "Python Garbage Queue")
-         :type mp:queue :read-only t))
+   :type hash-table :read-only t))
 
 (defun print-python-struct (py stream depth)
   (declare (ignore depth))
@@ -168,9 +158,10 @@
 (defun pydecref (thing)
   (flet ((decref (ob)
            (declare (type pyobject ob))
-           (when (/= 0 (foreign-pointer-address ob))
-             (Py_DecRef ob)
-             (setf (foreign-pointer-address ob) 0))))
+           (unschedule-finalization (pyobject-finalization ob))
+           (Py_DecRef ob)
+           (setf (foreign-pointer-address ob) 0
+                 (pyobject-finalization ob) nil)))
     (typecase thing
       (pyobject (decref thing))
       (list (loop for ob in thing
@@ -184,54 +175,14 @@
 (defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
 This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
-  (declare (type pyobject ob))
   (if* (pynull ob)
      then *pynull*
-     else (prog1 (foreign-pointer-address ob)
-            (setf (foreign-pointer-address ob) 0))))
-
-#+smp
-(defun pymarkgc (ob)
-  (when (typep ob 'pyobject)
-    (schedule-finalization ob 'pydecref :queue (python-gc-queue *python*)))
-  ob)
-
-#+smp
-(defun pygc (&key threshold)
-  (check-type *python* python)
-  (when (null (python-gc-process *python*))
-    (start-python-gc-process))
-  (flet ((run-gc ()
-           (let ((saved (PyEval_SaveThread)))
-             (unwind-protect
-                  (progn (setf (python-gc-invoking-process-gate *python*) (mp:make-gate nil))
-                         (mp:open-gate (python-gc-process-gate *python*))
-                         (mp:process-wait "wait for python gc finish"
-                                          'mp:gate-open-p (python-gc-invoking-process-gate *python*)))
-               (PyEval_RestoreThread saved)))))
-    (if* (typep threshold '(integer 0 *))
-       then (when (>= (mp:queue-length (python-gc-queue *python*))
-                      threshold)
-              (run-gc))
-       else (run-gc)))
-  (mp:queue-length (python-gc-queue *python*)))
-
-#+smp
-(defun start-python-gc-process ()
-  (flet ((process ()
-           (loop
-             (mp:process-wait "waiting for (pygc) is called"
-                              #'mp:gate-open-p (python-gc-process-gate *python*))
-             (let ((queue (python-gc-queue *python*)))
-               (when (not (mp:queue-empty-p queue))
-                 (with-python-gil (:unwind-protect nil)
-                   (loop for finalization = (mp:dequeue queue :wait nil)
-                         until (mp:queue-empty-p queue)
-                         do (call-finalizer finalization)))))
-             (mp:close-gate (python-gc-process-gate *python*))
-             (mp:open-gate (python-gc-invoking-process-gate *python*)))))
-    (setf (python-gc-process *python*)
-          (mp:process-run-function "python-gc-process" #'process))))
+     else (when (typep ob 'pyobject)
+            (let ((address (foreign-pointer-address ob)))
+              (unschedule-finalization (pyobject-finalization ob))
+              (setf (foreign-pointer-address ob) 0
+                    (pyobject-finalization ob) nil)
+              address))))
 
 ;;; python exception
 (define-condition python-exception (simple-pycl-error)
@@ -270,13 +221,12 @@ construct the \"msg\"."))
                                 ob_traceback) ; stolen
   (flet ((format-exception (ob)
            (with-output-to-string (out)
-             (dotimes (idx (PyList_Size ob))
-               (let (ob_unicode         ; borrowed
-                     line)
-                 (setq ob_unicode (PyList_GetItem ob idx))
-                 (setq line (from-pyunicode! ob_unicode))
-                 (write-string (string+ #\Space #\Space line)
-                               out))))))
+             (loop for idx from 0 below (PySequence_Size ob)
+                   for ob_unicode = (PySequence_GetItem ob idx)
+                   for line = (pyunicode-to-string ob_unicode)
+                   do (progn (write-string (string+ #\Space #\Space line)
+                                           out)
+                             (pydecref ob_unicode))))))
     (let* ((ob_module (pyimport! "traceback")) ; new
            (ob_formatter                       ; new
              (if* (= 0 ob_traceback)

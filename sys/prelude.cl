@@ -114,7 +114,7 @@
 ;;; objects. see also
 ;;; https://docs.python.org/3/c-api/intro.html#objects-types-and-reference-counts
 (defclass pyobject (foreign-pointer)
-  ()
+  ((finalization :accessor pyobject-finalization :type (or null excl::finalization)))
   (:documentation "Foreign pointer type for PyObject."))
 
 (defmethod print-object ((fp pyobject) stream)
@@ -136,8 +136,10 @@
   (case action
     (:convert (if* (= 0 address)
                  then *pynull*
-                 else (make-instance 'pyobject :foreign-type 'PyObject
-                                               :foreign-address address)))
+                 else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
+                                                         :foreign-address address)))
+                        (setf (pyobject-finalization ob) (schedule-finalization ob 'Py_DecRef))
+                        ob)))
     (:convert-type 'integer)
     (:identify :return)
     (:allocate nil)

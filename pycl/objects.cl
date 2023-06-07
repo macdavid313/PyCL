@@ -245,12 +245,12 @@
 
 (defun pystr (ob)
   (let ((ob_unicode (pycheckn (PyObject_Str ob))))
-    (unwind-protect (from-pyunicode! ob_unicode)
+    (unwind-protect (pyunicode-to-string ob_unicode)
       (pydecref ob_unicode))))
 
 (defun pyrepr (ob)
   (let ((ob_unicode (pycheckn (PyObject_Repr ob))))
-    (unwind-protect (from-pyunicode! ob_unicode)
+    (unwind-protect (pyunicode-to-string ob_unicode)
       (pydecref ob_unicode))))
 
 (defun check-args/pysequence-getter-setter (ob-seq idx)

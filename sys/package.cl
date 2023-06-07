@@ -22,7 +22,7 @@
    #:PyObject_DelAttrString
    #:check-python-gil
    #:PyRun_SimpleString
-   #:from-pyunicode!
+   #:pyunicode-to-string
    ;; --- Conditions
    #:pycl-condition
    #:simple-pycl-error
@@ -49,8 +49,6 @@
    #:pydecref
    #:pydecref*
    #:pystealref
-   #:pymarkgc
-   #:pygc
    ;; -- python exception
    #:python-exception
    #:python-exception-type
