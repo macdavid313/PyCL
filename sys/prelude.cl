@@ -117,6 +117,22 @@
   ((finalization :accessor pyobject-finalization :type (or null excl::finalization)))
   (:documentation "Foreign pointer type for PyObject."))
 
+(defvar-nonbindable *pynull*
+    (make-instance 'pyobject :foreign-type 'PyObject
+                             :foreign-address 0)
+  "A singleton that represents a NULL foreign python pointer")
+
+(defun make-pyobject (addr)
+  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) addr)
+           (optimize (speed 3) (safety 0) (space 0)))
+  (if* (= 0 addr)
+     then *pynull*
+     else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
+                                             :foreign-address addr)))
+            (setf (pyobject-finalization ob)
+                  (schedule-finalization ob '%pydecref))
+            ob)))
+
 (defmethod print-object ((fp pyobject) stream)
   (if* (= 0 (foreign-pointer-address fp))
      then (write-sequence "#<PyObject NULL>" stream)
@@ -124,22 +140,12 @@
             (format stream "#<PyObject @ #x~a>"
                     (foreign-pointer-address fp)))))
 
-(defvar-nonbindable *pynull*
-    (make-instance 'pyobject :foreign-type 'PyObject
-                             :foreign-address 0)
-  "A singleton that represents a NULL foreign python pointer")
-
 (defun foreign-python-funcall-converter/returning (action address ctype ltype)
   (declare (ignore ctype ltype)
            (type (unsigned-byte #+32bit 32 #+64bit 64) address)
            (optimize (speed 3) (safety 0) (space 0)))
   (case action
-    (:convert (if* (= 0 address)
-                 then *pynull*
-                 else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
-                                                         :foreign-address address)))
-                        (setf (pyobject-finalization ob) (schedule-finalization ob '%pydecref))
-                        ob)))
+    (:convert (make-pyobject address))
     (:convert-type 'integer)
     (:identify :return)
     (:allocate nil)

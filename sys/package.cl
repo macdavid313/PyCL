@@ -15,6 +15,7 @@
    #:+PyGILState_UNLOCKED+
    #:pyobject
    #:*pynull*
+   #:make-pyobject
    ;; capi
    #:+libpython-extern-variables+
    ;; sys

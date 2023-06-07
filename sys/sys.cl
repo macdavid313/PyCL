@@ -227,6 +227,6 @@ construct the \"msg\"."))
      else val))
 
 (defun pycheckz (val)
-  (if* (= -1 (minusp val))
+  (if* (= -1 val)
      then (pyerror)
      else val))

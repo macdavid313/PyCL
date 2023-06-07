@@ -1,52 +1,6 @@
 ;;;; objects.cl
 (in-package #:pycl)
 
-(define-condition pyobject-conversion-error (simple-pycl-error)
-  ())
-
-(defun make-pyobject-conversion-error (&key from to)
-  (make-instance 'pyobject-conversion-error
-                 :msg (cond ((and from (null to))
-                             (format nil "don't know how to convert ~a to pyobject" from))
-                            ((and (null from) to)
-                             (format nil "don't know how to convert a pyobject to ~a" to))
-                            (t (format nil "don't know to convert ~a to ~a" from to)))))
-
-(defun make-pyobject (x &optional subclass)
-  (declare (type (or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) x))
-  (etypecase x
-    ((unsigned-byte #+32bit 32 #+64bit 64)
-     (if* (= 0 x)
-        then *pynull*
-        else (make-instance (if subclass subclass 'pyobject)
-                            :foreign-type 'PyObject
-                            :foreign-address x)))
-    (pyobject (if* (pynull x)
-                 then *pynull*
-                 else (make-instance (if subclass subclass 'pyobject)
-                                     :foreign-type 'PyObject
-                                     :foreign-address (foreign-pointer-address x))))))
-
-(defgeneric to-pyobject (thing)
-  (:documentation "Default method for converting a lisp value to a PyObject pointer")
-  (:method (thing) (values *pynull* (make-pyobject-conversion-error :from thing)))
-  (:method ((fp pyobject)) fp))
-
-(defgeneric from-pyobject (ob output-type-spec)
-  (:documentation "Default method for converting a PyObject pointer to a lisp value"))
-
-(defclass pynone (pyobject) ())
-(defclass pybool (pyobject) ())
-(defclass pylong (pyobject) ())
-(defclass pyfloat (pyobject) ())
-(defclass pycomplex (pyobject) ())
-(defclass pybytes (pyobject) ())
-(defclass pybytearray (pyobject) ())
-(defclass pyunicode (pyobject) ())
-(defclass pylist (pyobject) ())
-(defclass pytuple (pyobject) ())
-(defclass pydict (pyobject) ())
-
 (defun make-pynone ()
   (make-pyobject (pyglobalptr 'Py_None) 'pynone))
 
@@ -226,32 +180,11 @@
 ;; (defmethod to-pyobject ((x hash-table)) (make-pydict x))
 
 ;;; protocols
-(defun pytype-of (ob)
-  (let ((ob_type (pycheckn (PyObject_Type ob))))
-    (unwind-protect (pyglobalptr ob_type)
-      (pydecref ob_type))))
-
-(defun pytypep (ob type)
-  (let ((res (etypecase type
-               (symbol (let ((ptr (pyglobalptr type)))
-                         (when ptr (PyObject_IsInstance ob (pyglobalptr type)))))
-               ((or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) (PyObject_IsInstance ob type)))))
-    (declare (type (integer -1 1) res))
-    (= (pycheckz res) 1)))
-
-(defun pylen (ob)
-  (check-type ob pyobject)
-  (pycheckz (PyObject_Length ob)))
-
-(defun pystr (ob)
-  (let ((ob_unicode (pycheckn (PyObject_Str ob))))
-    (unwind-protect (pyunicode-to-string ob_unicode)
-      (pydecref ob_unicode))))
-
-(defun pyrepr (ob)
-  (let ((ob_unicode (pycheckn (PyObject_Repr ob))))
-    (unwind-protect (pyunicode-to-string ob_unicode)
-      (pydecref ob_unicode))))
+;;; Utilities
+(defun pyimport! (module)
+  (declare (type simple-string module))
+  (with-native-string (str module :external-format :utf-8)
+    (the pyobject (PyImport_ImportModule str))))
 
 (defun check-args/pysequence-getter-setter (ob-seq idx)
   (check-type ob-seq pyobject)

@@ -20,7 +20,7 @@
                    ;; start of pycl module
                    "pycl/package"
                    "pycl/init"
-                   "pycl/objects"
+                   "pycl/abstract"
                    ;; files list ends here
                    )))
       (mapcar (lambda (file)
