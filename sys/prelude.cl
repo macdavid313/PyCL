@@ -138,7 +138,7 @@
                  then *pynull*
                  else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
                                                          :foreign-address address)))
-                        (setf (pyobject-finalization ob) (schedule-finalization ob 'Py_DecRef))
+                        (setf (pyobject-finalization ob) (schedule-finalization ob '%pydecref))
                         ob)))
     (:convert-type 'integer)
     (:identify :return)

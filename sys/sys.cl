@@ -10,8 +10,8 @@
   :call-direct t
   :allow-gc :always)
 
-(def-foreign-call (check-python-gil "PyGILState_Check") (:void)
-  :returning :boolean
+(def-foreign-call PyGILState_Check (:void)
+  :returning :int
   :arg-checking nil
   :call-direct t
   :allow-gc :always)
@@ -22,10 +22,10 @@
   :call-direct t
   :allow-gc :always)
 
-(def-foreign-call (pyunicode-to-string "PyUnicode_AsUTF8") ((o (* PyObject)))
-  :returning ((* :char) simple-string)
+(def-foreign-call PyUnicode_AsUTF8 ((o (* PyObject)))
+  :returning :foreign-address
   :arg-checking nil
-  :strings-convert t
+  :call-direct t
   :allow-gc :always)
 
 ;;; Conditions
@@ -40,33 +40,6 @@
     (format stream "~%  ")
     (with-slots (msg) err
       (write-line msg stream))))
-
-;;; Utilities
-(defun pyimport! (module)
-  (declare (type simple-string module))
-  (with-native-string (str module :external-format :utf-8)
-    (the pyobject (PyImport_ImportModule str))))
-
-(defun pyhasattr! (ob attr)
-  (declare (type pyobject ob)
-           (type simple-string attr))
-  (with-native-string (str attr :external-format :utf-8)
-    (= 1 (PyObject_HasAttrString ob str))))
-
-(defun pyattr! (ob attr)
-  (declare (type pyobject ob)
-           (type simple-string attr))
-  (with-native-string (str attr :external-format :utf-8)
-    (values (PyObject_GetAttrString ob str)
-            (= 1 (PyObject_HasAttrString ob str)))))
-
-(defun (setf pyattr!) (new ob attr)
-  (declare (type pyobject ob new)
-           (type simple-string attr))
-  (with-native-string (str attr :external-format :utf-8)
-    (if* (and (pynull new) (pyhasattr! ob attr))
-       then (PyObject_DelAttrString ob str)
-       else (PyObject_SetAttrString ob str new))))
 
 ;;; Python and its GIL
 (defvar-nonbindable *python* nil
@@ -145,32 +118,34 @@
        (= (foreign-pointer-address x)
           (foreign-pointer-address y))))
 
-(defun pynull (thing)
-  (or (eq thing *pynull*)
-      (and (typep thing 'pyobject)
-           (= 0 (foreign-pointer-address thing)))))
+(defun pynull (ob)
+  (or (eq ob *pynull*)
+      (and (typep ob 'pyobject)
+           (= 0 (foreign-pointer-address ob)))))
 
-(defun pyincref (thing)
-  (when (typep thing 'pyobject)
-    (Py_IncRef thing))
-  thing)
+(defun pyincref (ob)
+  (when (typep ob 'pyobject)
+    (Py_IncRef ob))
+  ob)
 
-(defun pydecref (thing)
-  (flet ((decref (ob)
-           (declare (type pyobject ob))
-           (unschedule-finalization (pyobject-finalization ob))
-           (Py_DecRef ob)
-           (setf (foreign-pointer-address ob) 0
-                 (pyobject-finalization ob) nil)))
-    (typecase thing
-      (pyobject (decref thing))
-      (list (loop for ob in thing
-                  when (typep ob 'pyobject)
-                    do (decref ob)))))
+(defun %pydecref (ob)
+  (declare (type pyobject ob)
+           (optimize (speed 3) (safety 0) (space 0)))
+  (when (typep ob 'pyobject)
+    (unschedule-finalization (pyobject-finalization ob))
+    (Py_DecRef ob)
+    (setf (foreign-pointer-address ob) 0
+          (pyobject-finalization ob) nil))
   nil)
 
+(defun pydecref (ob)
+  (if* (pynull ob)
+     then nil
+     else (%pydecref ob)))
+
 (defun pydecref* (&rest obs)
-  (pydecref obs))
+  (dolist (ob obs)
+    (pydecref ob)))
 
 (defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
@@ -219,44 +194,39 @@ construct the \"msg\"."))
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
                                 ob_traceback) ; stolen
-  (flet ((format-exception (ob)
-           (with-output-to-string (out)
-             (loop for idx from 0 below (PySequence_Size ob)
-                   for ob_unicode = (PySequence_GetItem ob idx)
-                   for line = (pyunicode-to-string ob_unicode)
-                   do (progn (write-string (string+ #\Space #\Space line)
-                                           out)
-                             (pydecref ob_unicode))))))
-    (let* ((ob_module (pyimport! "traceback")) ; new
-           (ob_formatter                       ; new
-             (if* (= 0 ob_traceback)
-                then (pyattr! ob_module "format_exception_only")
-                else (pyattr! ob_module "format_exception")))
-           (ob_tuple (PyTuple_New (if (= 0 ob_traceback) 2 3))) ; new
-           ob_list)                                             ; new
-      (if* (pynull ob_tuple)
-         then (prog1 "None"
-                (pydecref* ob_module ob_formatter ob_tuple))
-         else (PyTuple_SetItem ob_tuple 0 ob_type)
-              (PyTuple_SetItem ob_tuple 1 ob_value)
-              (when (/= 0 ob_traceback)
-                (PyTuple_SetItem ob_tuple 2 ob_traceback))
-              (setq ob_list (PyObject_CallObject ob_formatter ob_tuple))
-              (prog1 (format-exception ob_list)
-                (pydecref* ob_module ob_formatter ob_tuple ob_list))))))
-
-(defun pyexcept ()
-  (make-python-exception))
+  (let* ((ob_module                           ; new
+           (with-native-string (str "traceback" :external-format :utf-8)
+             (PyImport_ImportModule str)))
+         (ob_formatter                  ; new
+           (if* (= 0 ob_traceback)
+              then (with-native-string (str "format_exception_only" :external-format :utf-8)
+                     (PyObject_GetAttrString ob_module str))
+              else (with-native-string (str "format_exception" :external-format :utf-8)
+                     (PyObject_GetAttrString ob_module str))))
+         (ob_tuple (PyTuple_New (if (= 0 ob_traceback) 2 3)))) ; new
+    (PyTuple_SetItem ob_tuple 0 ob_type)
+    (PyTuple_SetItem ob_tuple 1 ob_value)
+    (when (/= 0 ob_traceback)
+      (PyTuple_SetItem ob_tuple 2 ob_traceback))
+    (with-output-to-string (out)
+      (loop with ob_list = (PyObject_CallObject ob_formatter ob_tuple) ; new
+            for idx from 0 below (PyList_Size ob_list)
+            for ob_unicode = (PySequence_GetItem ob_list idx) ; new
+            for line = (native-to-string (PyUnicode_AsUTF8 ob_unicode) :external-format :utf-8)
+            do (progn (write-string (string+ #\Space #\Space line)
+                                    out)
+                      (pydecref ob_unicode))
+            finally (pydecref* ob_module ob_formatter ob_tuple ob_list)))))
 
 (defun pyerror ()
-  (error (pyexcept)))
+  (error (make-python-exception)))
 
 (defun pycheckn (val)
   (if* (pynull val)
-     then (values *pynull* (pyexcept))
-     else (values val nil)))
+     then (pyerror)
+     else val))
 
 (defun pycheckz (val)
   (if* (= -1 (minusp val))
-     then (values *pynull* (pyexcept))
-     else (values val nil)))
+     then (pyerror)
+     else val))

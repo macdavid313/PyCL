@@ -20,16 +20,12 @@
    ;; sys
    ;; --- "lost and found"
    #:PyObject_DelAttrString
-   #:check-python-gil
+   #:PyGILState_Check
    #:PyRun_SimpleString
-   #:pyunicode-to-string
+   #:PyUnicode_AsUTF8
    ;; --- Conditions
    #:pycl-condition
    #:simple-pycl-error
-   ;; --- Utilities
-   #:pyimport!
-   #:pyhasattr!
-   #:pyattr!
    ;; --- Python and its GIL
    #:*python*
    #:python
@@ -55,7 +51,6 @@
    #:python-exception-msg
    #:python-exception-occurred
    #:make-python-exception
-   #:pyexcept
    #:pyerror
    #:pycheckn
    #:pycheckz))
