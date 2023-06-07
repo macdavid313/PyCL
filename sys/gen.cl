@@ -57,7 +57,7 @@
            :returning ,(translate-foreign-type return-type :ret t)
            :allow-gc :always
            :call-direct ,(not (null args))
-           :arg-checking t)))))
+           :arg-checking nil)))))
 
 (defun write-form (form)
   (when form
