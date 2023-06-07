@@ -28,7 +28,7 @@
 (defmethod pyattr ((ob pyobject) attr)
   (assert (not (pynull ob)))
   (with-native-string (str attr :external-format :utf-8)
-    (values (PyObject_GetAttrString ob str)
+    (values (pycheckn (PyObject_GetAttrString ob str))
             (= 1 (PyObject_HasAttrString ob str)))))
 
 (defmethod (setf pyattr) (new (ob pyobject) attr)
@@ -36,8 +36,8 @@
   (let ((ob-new (to-pyobject new)))
     (with-native-string (str attr :external-format :utf-8)
       (if* (and (pynull ob-new) (pyhasattr ob attr))
-         then (PyObject_DelAttrString ob str)
-         else (PyObject_SetAttrString ob str ob-new)))))
+         then (pycheckz (PyObject_DelAttrString ob str))
+         else (pycheckz (PyObject_SetAttrString ob str ob-new))))))
 
 (defmethod pyrepr ((ob pyobject))
   (let ((ob_unicode (pycheckn (PyObject_Repr ob))))
@@ -62,10 +62,10 @@
                         :null-terminate nil))))
 
 (defmethod pytypep ((ob pyobject) (type symbol))
-  (= (pycheckz (let ((ptr (pyglobalptr type)))
-                 (if* ptr
-                    then (PyObject_IsInstance ob ptr)
-                    else (error "Don't know how to find python type's address: ~a" type))))
+  (= (let ((ptr (pyglobalptr type)))
+       (if* ptr
+          then (pycheckz (PyObject_IsInstance ob ptr))
+          else (error "Don't know how to find python type's address: ~a" type)))
      1))
 
 (defmethod pytypep ((ob pyobject) (type integer))
@@ -103,7 +103,6 @@
 
 (defmethod pylen ((ob pyobject))
   (pycheckz (PyObject_Length ob)))
-
 
 (defmethod pyiter ((ob pyobject))
   (pycheckn (PyObject_GetIter ob)))

@@ -161,35 +161,27 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
 
 ;;; python exception
 (define-condition python-exception (simple-pycl-error)
-  ((type :initarg :type :initform nil :accessor python-exception-type :type (or null symbol))
-   (msg :initarg :msg :initform "" :accessor python-exception-msg :type simple-string))
+  ((place :initarg :place :initform nil :accessor python-exception-place :type (or null symbol))
+   (type :initarg :type :initform nil :accessor python-exception-type :type (or null symbol))
+   (msg :initarg :msg :initform "" :accessor python-exception-msg :type simple-string)
+   (context :initarg :context :initform nil :accessor python-exception-context :type list))
   (:documentation "A simple condition that represents a python exception. User is responsible to
 construct the \"msg\"."))
 
 (defmethod print-object ((exc python-exception) stream)
   (print-unreadable-object (exc stream :type t :identity t)
-    (with-slots (msg) exc
-      (format stream "- python exception caught: ~%~a" msg))))
+    (with-slots (place msg) exc
+      (if* place
+         then (format stream "caught python exception during calling ~a: ~%~a" place msg)
+         else (format stream "- python exception caught: ~%~a" msg)))))
 
 (define-symbol-macro python-exception-occurred
-    (not (pynull (PyErr_Occurred))))
-
-(defun make-python-exception ()
-  (if* python-exception-occurred
-     then (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
-                                 (ob_value* #1# :allocation :c)
-                                 (ob_traceback* #1# :allocation :c))
-            (PyErr_Fetch ob_type* ob_value* ob_traceback*)
-            (PyErr_NormalizeException ob_type* ob_value* ob_traceback*)
-            (let ((ob_type (fslot-value-typed #1# :c ob_type*))
-                  (ob_value (fslot-value-typed #1# :c ob_value*))
-                  (ob_traceback (fslot-value-typed #1# :c ob_traceback*)))
-              (prog1 (make-instance 'python-exception
-                                    :type (pyglobalptr ob_type)
-                                    :msg (format-python-exception ob_type ob_value ob_traceback))
-                (PyErr_Clear))))
-     else (make-instance 'simple-pycl-error
-                          :msg "trying to catch a python exception but none has occurred")))
+    (let ((err (PyErr_Occurred)))       ; borrowed
+      (declare (type pyobject err))
+      (if* (pynull err)
+         then nil
+         else (unschedule-finalization (pyobject-finalization err))
+              t)))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
@@ -218,15 +210,52 @@ construct the \"msg\"."))
                       (pydecref ob_unicode))
             finally (pydecref* ob_module ob_formatter ob_tuple ob_list)))))
 
-(defun pyerror ()
-  (error (make-python-exception)))
+(defun pyerror (&optional place)
+  (if* python-exception-occurred
+     then (with-static-fobjects ((ob_type* #1='(* PyObject) :allocation :c)
+                                 (ob_value* #1# :allocation :c)
+                                 (ob_traceback* #1# :allocation :c))
+            (PyErr_Fetch ob_type* ob_value* ob_traceback*)
+            (PyErr_NormalizeException ob_type* ob_value* ob_traceback*)
+            (let ((ob_type (fslot-value-typed #1# :c ob_type*))
+                  (ob_value (fslot-value-typed #1# :c ob_value*))
+                  (ob_traceback (fslot-value-typed #1# :c ob_traceback*))
+                  exception)
+              (Py_IncRef ob_type)
+              (Py_IncRef ob_value)
+              (Py_IncRef ob_traceback)
+              (setq exception (make-instance 'python-exception
+                                             :place place
+                                             :type (pyglobalptr ob_type)
+                                             :msg (format-python-exception ob_type ob_value ob_traceback)
+                                             :context (list (make-pyobject ob_type)
+                                                            (make-pyobject ob_value)
+                                                            (make-pyobject ob_traceback))))
+              (PyErr_Clear)
+              (error exception)))
+     else (error 'simple-pycl-error
+                 :msg "trying to catch a python exception but none has occurred")))
 
-(defun pycheckn (val)
-  (if* (pynull val)
-     then (pyerror)
-     else val))
+(defmacro pycheckn (form &optional (place nil place-p))
+  (when (and (not place-p)
+             (symbolp (car form)))
+    (setq place (car form)))
+  (check-type place symbol)
+  (let ((val (gensym "val")))
+    `(let ((,val ,form))
+       (declare (type pyobject ,val))
+       (if* (pynull ,val)
+          then (pyerror ',place)
+          else ,val))))
 
-(defun pycheckz (val)
-  (if* (= -1 val)
-     then (pyerror)
-     else val))
+(defmacro pycheckz (form &optional (place nil place-p))
+  (when (and (not place-p)
+             (symbolp (car form)))
+    (setq place (car form)))
+  (check-type place symbol)
+  (let ((val (gensym "val")))
+    `(let ((,val ,form))
+       (declare (type integer ,val))
+       (if* (= ,val -1)
+          then (pyerror ',place)
+          else ,val))))
