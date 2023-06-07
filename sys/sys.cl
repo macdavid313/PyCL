@@ -149,36 +149,37 @@
 
 ;;; pyobject
 ;;; APIs and Utilities
-(defun pyptr-eq (x y)
-  (and (typep x 'foreign-python-pointer)
-       (typep y 'foreign-python-pointer)
-       (eq (foreign-pointer-type x) (foreign-pointer-type y))
+(defun pyobject-eq (x y)
+  (and (typep x 'pyobject)
+       (typep y 'pyobject)
        (= (foreign-pointer-address x)
           (foreign-pointer-address y))))
 
 (defun pynull (thing)
   (or (eq thing *pynull*)
-      (and (typep thing 'pyptr)
+      (and (typep thing 'pyobject)
            (= 0 (foreign-pointer-address thing)))))
 
-(defun pyincref (ob)
-  (declare (type pyobject ob))
-  (when (typep ob 'pyobject)
-    (Py_IncRef ob)
-    ob))
+(defun pyincref (thing)
+  (when (typep thing 'pyobject)
+    (Py_IncRef thing))
+  thing)
 
-(defun pydecref (ob)
-  (declare (type pyobject ob))
-  (when (typep ob 'pyobject)
-    (Py_DecRef ob)
-    (setf (foreign-pointer-address ob) 0))
-  ob)
+(defun pydecref (thing)
+  (flet ((decref (ob)
+           (declare (type pyobject ob))
+           (when (/= 0 (foreign-pointer-address ob))
+             (Py_DecRef ob)
+             (setf (foreign-pointer-address ob) 0))))
+    (typecase thing
+      (pyobject (decref thing))
+      (list (loop for ob in thing
+                  when (typep ob 'pyobject)
+                    do (decref ob)))))
+  nil)
 
 (defun pydecref* (&rest obs)
-  (dolist (ob obs)
-    (when (typep ob 'pyobject)
-      (Py_DecRef ob)
-      (setf (foreign-pointer-address ob) 0))))
+  (pydecref obs))
 
 (defun pystealref (ob)
   "The caller (thief) will take the ownership so you are NOT responsible anymore.

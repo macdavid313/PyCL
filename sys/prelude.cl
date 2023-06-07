@@ -106,45 +106,38 @@
      (slots (* PyType_Slot))))
 
 ;;; Lisp type definitions
-(defclass pyptr (foreign-pointer)
-  ()
-  (:documentation "A dedicated type for a python foreign pointer e.g. PyObject*, PyModuleDef*"))
-
-(defun make-pyptr (address &optional ctype)
-  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) address))
-  (make-instance 'pyptr :foreign-type ctype
-                        :foreign-address address))
-
-(defmethod print-object ((fp pyptr) stream)
-  (if* (= 0 (foreign-pointer-address fp))
-     then (format stream "#<~a NULL>" (or (foreign-pointer-type fp) 'pyptr))
-     else (let ((*print-base* 16))
-            (format stream "#<~a @ #x~a>"
-                    (or (foreign-pointer-type fp) 'pyptr)
-                    (foreign-pointer-address fp)))))
-
-(defclass pyobject (pyptr)
+;;; ---------------------
+;;; Almost all Python objects live on the heap: you never declare an automatic
+;;; or static variable of type PyObject, only pointer variables of type
+;;; PyObject* can be declared. The sole exception are the type objects; since
+;;; these must never be deallocated, they are typically static PyTypeObject
+;;; objects. see also
+;;; https://docs.python.org/3/c-api/intro.html#objects-types-and-reference-counts
+(defclass pyobject (foreign-pointer)
   ()
   (:documentation "Foreign pointer type for PyObject."))
 
-(defmethod foreign-pointer-type ((fp pyobject)) 'PyObject)
+(defmethod print-object ((fp pyobject) stream)
+  (if* (= 0 (foreign-pointer-address fp))
+     then (write-sequence "#<PyObject NULL>" stream)
+     else (let ((*print-base* 16))
+            (format stream "#<PyObject @ #x~a>"
+                    (foreign-pointer-address fp)))))
 
 (defvar-nonbindable *pynull*
     (make-instance 'pyobject :foreign-type 'PyObject
                              :foreign-address 0)
-  "A singleton that represents a NULL PyObject pointer")
+  "A singleton that represents a NULL foreign python pointer")
 
 (defun foreign-python-funcall-converter/returning (action address ctype ltype)
-  (declare (ignore ltype)
+  (declare (ignore ctype ltype)
            (type (unsigned-byte #+32bit 32 #+64bit 64) address)
            (optimize (speed 3) (safety 0) (space 0)))
   (case action
-    (:convert (if* (eq 'PyObject (second ctype))
-                 then (if* (= 0 address)
-                         then *pynull*
-                         else (make-instance 'pyobject :foreign-type 'PyObject
-                                                       :foreign-address address))
-                 else (make-pyptr (second ctype) address)))
+    (:convert (if* (= 0 address)
+                 then *pynull*
+                 else (make-instance 'pyobject :foreign-type 'PyObject
+                                               :foreign-address address)))
     (:convert-type 'integer)
     (:identify :return)
     (:allocate nil)

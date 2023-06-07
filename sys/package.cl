@@ -13,7 +13,6 @@
    #:+PY_LOCK_INTR+
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
-   #:pyptr
    #:pyobject
    #:*pynull*
    ;; capi
@@ -44,7 +43,7 @@
    #:with-python-gil
    ;; --- pyobject
    ;; APIs and Utilities
-   #:pyptr-eq
+   #:pyobject-eq
    #:pynull
    #:pyincref
    #:pydecref

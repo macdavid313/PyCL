@@ -235,7 +235,7 @@
   (let ((res (etypecase type
                (symbol (let ((ptr (pyglobalptr type)))
                          (when ptr (PyObject_IsInstance ob (pyglobalptr type)))))
-               ((or pyptr (unsigned-byte #+32bit 32 #+64bit 64)) (PyObject_IsInstance ob type)))))
+               ((or pyobject (unsigned-byte #+32bit 32 #+64bit 64)) (PyObject_IsInstance ob type)))))
     (declare (type (integer -1 1) res))
     (= (pycheckz res) 1)))
 
