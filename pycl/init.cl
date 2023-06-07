@@ -75,7 +75,7 @@ else:
     (assert (/= 0 address))
     (funcall
      `(lambda ()
-        (setf (pyglobalptr ',(intern name)) ,address)))))
+        (setf (pyglobalptr ',(intern name :pycl)) ,address)))))
 
 (defun startup ()
   "This function runs after a python instance has been successfully initialized."
