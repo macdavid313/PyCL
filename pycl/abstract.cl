@@ -1,6 +1,14 @@
 ;;;; abstract.cl
 (in-package #:pycl)
 
+(define-condition null-pyobject-error (simple-pycl-error)
+  ())
+
+(defun check-null-pyobject (ob)
+  (declare (type pyobject ob))
+  (when (pynull ob)
+    (error 'null-pyobject-error :msg "~a is a NULL pyobject")))
+
 (define-condition pyobject-conversion-error (simple-pycl-error)
   ())
 
@@ -17,25 +25,34 @@
   (:method (thing) (pyobject-conversion-error :from thing))
   (:method ((fp pyobject)) fp))
 
-(defgeneric from-pyobject (ob &rest args &key output-type-spec &allow-other-keys)
-  (:documentation "Default method for converting a PyObject pointer to a lisp value"))
+;; (defgeneric from-pyobject (ob &rest args &key output-type-spec &allow-other-keys)
+;;   (:documentation "Default method for converting a PyObject pointer to a lisp value"))
 
-(defmethod pyhasattr ((ob pyobject) attr)
-  (and (not (pynull ob))
-       (with-native-string (str attr :external-format :utf-8)
-         (= 1 (PyObject_HasAttrString ob str)))))
+(defgeneric pyhasattr (ob attr)
+  (:documentation "Returns t if a pyobject `ob' has attribute `attr'; returns nil otherwise.")
+  (:method :before ((ob pyobject) attr)
+    (declare (ignore attr))
+    (check-null-pyobject ob))
+  (:method ((ob pyobject) attr)
+    (with-native-string (str (string+ attr) :external-format :utf-8)
+      (= 1 (PyObject_HasAttrString ob str)))))
 
-(defmethod pyattr ((ob pyobject) attr)
-  (assert (not (pynull ob)))
-  (with-native-string (str attr :external-format :utf-8)
-    (values (pycheckn (PyObject_GetAttrString ob str))
-            (= 1 (PyObject_HasAttrString ob str)))))
+(defgeneric pyattr (ob attr)
+  (:documentation "Retrieve an attribute `attr' from pyobject ob. This is the equivalent of the
+Python expression `ob.attr'.")
+  (:method :before ((ob pyobject) attr)
+    (declare (ignore attr))
+    (check-null-pyobject ob))
+  (:method ((ob pyobject) attr)
+    (with-native-string (str (string+ attr) :external-format :utf-8)
+      (values (pycheckn (PyObject_GetAttrString ob str))
+              (= 1 (PyObject_HasAttrString ob str))))))
 
 (defmethod (setf pyattr) (new (ob pyobject) attr)
-  (assert (not (pynull ob)))
+  ;; (assert (not (pynull ob)))
   (let ((ob-new (to-pyobject new)))
-    (with-native-string (str attr :external-format :utf-8)
-      (if* (and (pynull ob-new) (pyhasattr ob attr))
+    (with-native-string (str (string+ attr) :external-format :utf-8)
+      (if* (and (pynull ob-new) (= 1 (PyObject_HasAttrString ob str)))
          then (pycheckz (PyObject_DelAttrString ob str))
          else (pycheckz (PyObject_SetAttrString ob str ob-new))))))
 
