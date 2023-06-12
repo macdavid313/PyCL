@@ -14,6 +14,7 @@
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
    #:pyobject
+   #:pyobject-finalization
    #:*pynull*
    #:make-pyobject
    ;; capi

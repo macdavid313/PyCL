@@ -14,5 +14,4 @@
    ;; conditions
    #:pycl-condition
    #:python-error
-   #:pycl-error
-   ))
+   #:pycl-error))

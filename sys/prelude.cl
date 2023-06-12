@@ -137,7 +137,8 @@
   (if* (= 0 (foreign-pointer-address fp))
      then (write-sequence "#<PyObject NULL>" stream)
      else (let ((*print-base* 16))
-            (format stream "#<PyObject @ #x~a>"
+            (format stream "#<~a @ #x~a>"
+                    (class-name (class-of fp))
                     (foreign-pointer-address fp)))))
 
 (defun foreign-python-funcall-converter/returning (action address ctype ltype)

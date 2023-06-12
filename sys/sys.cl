@@ -73,11 +73,10 @@
 
 (defun pyglobalptr (symbol-or-address)
   (let ((k symbol-or-address))
-    (typecase symbol-or-address
+    (etypecase symbol-or-address
       (symbol (gethash k (python-globalptr *python*)))
       ((unsigned-byte #+32bit 32 #+64bit 64) (gethash k (python-inv-globalptr *python*)))
-      (foreign-pointer (gethash (foreign-pointer-address k) (python-inv-globalptr *python*)))
-      (t nil))))
+      (foreign-pointer (gethash (foreign-pointer-address k) (python-inv-globalptr *python*))))))
 
 (defun (setf pyglobalptr) (new-addr sym)
   (when (and (symbolp sym)
