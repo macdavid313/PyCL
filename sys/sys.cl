@@ -111,52 +111,94 @@
 
 ;;; pyobject
 ;;; APIs and Utilities
-(defun pyobject-eq (x y)
-  (and (typep x 'pyobject)
-       (typep y 'pyobject)
-       (= (foreign-pointer-address x)
-          (foreign-pointer-address y))))
+;;; -----------------------------------------------------------------------------
+;;; Almost all Python objects live on the heap: you never declare an automatic
+;;; or static variable of type PyObject, only pointer variables of type
+;;; PyObject* can be declared. The sole exception are the type objects; since
+;;; these must never be deallocated, they are typically static PyTypeObject
+;;; objects. see also
+;;; https://docs.python.org/3/c-api/intro.html#objects-types-and-reference-counts
+;;; -----------------------------------------------------------------------------
+(defclass pyobject (foreign-pointer)
+  ((ptype :initform nil :accessor pyobject-type :type (or symbol (unsigned-byte #+32bit 32 #+64bit 64)))
+   (finalization :accessor pyobject-finalization :type (or null excl::finalization)))
+  (:documentation "Foreign pointer type for PyObject."))
 
-(defun pynull (ob)
+(defvar-nonbindable *pynull*
+    (make-instance 'pyobject :foreign-type 'PyObject
+                             :foreign-address 0)
+  "A singleton that represents a NULL foreign pointer of PyObject")
+
+(defun make-pyobject (addr &optional (lifetime :new))
+  (declare (type (unsigned-byte #+32bit 32 #+64bit 64) addr)
+           (type (member :default :new :borrowed) lifetime)
+           (optimize (speed 3) (safety 0) (space 0)))
+  (if* (= 0 addr)
+     then *pynull*
+     else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
+                                             :foreign-address addr)))
+            (when (member lifetime '(:default :new) :test 'eq)
+              (schedule-pyobject-finalization ob))
+            (setf (pyobject-type ob)
+                  (pyglobalptr (PyObject_Type addr)))
+            ob)))
+
+(defmethod print-object ((fp pyobject) stream)
+  (if* (= 0 (foreign-pointer-address fp))
+     then (write-sequence "#<PyObject NULL>" stream)
+     else (let ((*print-base* 16))
+            (if* (pyobject-type fp)
+               then (format stream "#<PyObject (~a) @ #x~a>"
+                                   (pyobject-type fp)
+                                   (foreign-pointer-address fp))
+               else (format stream "#<PyObject @ #x~a>"
+                                   (foreign-pointer-address fp))))))
+
+(defun pyobject-p (thing)
+  (typep thing 'pyobject))
+
+(defmethod pyobject-eq ((x pyobject) (y pyobject))
+  (= (foreign-pointer-address x)
+     (foreign-pointer-address y)))
+
+(defmethod pynull ((ob pyobject))
   (or (eq ob *pynull*)
-      (and (typep ob 'pyobject)
-           (= 0 (foreign-pointer-address ob)))))
+      (= 0 (foreign-pointer-address ob))))
 
-(defun pyincref (ob)
-  (when (typep ob 'pyobject)
-    (Py_IncRef ob))
+(defmethod pyincref ((ob pyobject))
+  (Py_IncRef ob)
   ob)
 
-(defun %pydecref (ob)
-  (declare (type pyobject ob)
-           (optimize (speed 3) (safety 0) (space 0)))
-  (when (typep ob 'pyobject)
-    (unschedule-finalization (pyobject-finalization ob))
+(defmethod pydecref ((ob pyobject))
+  (when (not (pynull ob))
+    (unschedule-pyobject-finalization ob)
     (Py_DecRef ob)
-    (setf (foreign-pointer-address ob) 0
-          (pyobject-finalization ob) nil))
-  nil)
-
-(defun pydecref (ob)
-  (if* (pynull ob)
-     then nil
-     else (%pydecref ob)))
+    (setf (foreign-pointer-address ob) 0)))
 
 (defun pydecref* (&rest obs)
   (dolist (ob obs)
     (pydecref ob)))
 
-(defun pystealref (ob)
+(defmethod pystealref ((ob pyobject))
   "The caller (thief) will take the ownership so you are NOT responsible anymore.
 This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (pystealref ob_item))"
   (if* (pynull ob)
      then *pynull*
-     else (when (typep ob 'pyobject)
-            (let ((address (foreign-pointer-address ob)))
-              (unschedule-finalization (pyobject-finalization ob))
-              (setf (foreign-pointer-address ob) 0
-                    (pyobject-finalization ob) nil)
-              address))))
+     else (let ((address (foreign-pointer-address ob)))
+            (unschedule-pyobject-finalization ob)
+            (setf (foreign-pointer-address ob) 0)
+            address)))
+
+(defmethod schedule-pyobject-finalization ((ob pyobject))
+  (setf (pyobject-finalization ob)
+        (schedule-finalization ob 'pydecref))
+  ob)
+
+(defmethod unschedule-pyobject-finalization ((ob pyobject))
+  (when (pyobject-finalization ob)
+    (unschedule-finalization (pyobject-finalization ob))
+    (setf (pyobject-finalization ob) nil))
+  ob)
 
 ;;; python exception
 (define-condition python-exception (simple-pycl-error)
@@ -175,17 +217,13 @@ construct the \"msg\"."))
          else (format stream "- python exception caught: ~%~a" msg)))))
 
 (define-symbol-macro python-exception-occurred
-    (let ((err (PyErr_Occurred)))       ; borrowed
-      (declare (type pyobject err))
-      (if* (pynull err)
-         then nil
-         else (unschedule-finalization (pyobject-finalization err))
-              t)))
+    (/= 0 (PyErr_Occurred)))
 
 (defun format-python-exception (ob_type       ; stolen
                                 ob_value      ; sotlen
                                 ob_traceback) ; stolen
-  (let* ((ob_module                           ; new
+  (declare (optimize (speed 3) (safety 0) (space 0)))
+  (let* ((ob_module                     ; new
            (with-native-string (str "traceback" :external-format :utf-8)
              (PyImport_ImportModule str)))
          (ob_formatter                  ; new
@@ -195,19 +233,20 @@ construct the \"msg\"."))
               else (with-native-string (str "format_exception" :external-format :utf-8)
                      (PyObject_GetAttrString ob_module str))))
          (ob_tuple (PyTuple_New (if (= 0 ob_traceback) 2 3)))) ; new
+    (declare (type #1=(unsigned-byte #+32bit 32 #+64bit 64) ob_module ob_formatter ob_tuple))
     (PyTuple_SetItem ob_tuple 0 ob_type)
     (PyTuple_SetItem ob_tuple 1 ob_value)
     (when (/= 0 ob_traceback)
       (PyTuple_SetItem ob_tuple 2 ob_traceback))
     (with-output-to-string (out)
-      (loop with ob_list = (PyObject_CallObject ob_formatter ob_tuple) ; new
-            for idx from 0 below (PyList_Size ob_list)
-            for ob_unicode = (PySequence_GetItem ob_list idx) ; new
+      (loop with ob_list of-type #1# = (PyObject_CallObject ob_formatter ob_tuple) ; new
+            for idx of-type fixnum from 0 below (PyList_Size ob_list)
+            for ob_unicode of-type #1# = (PyList_GetItem ob_list idx) ; borrowed
             for line = (native-to-string (PyUnicode_AsUTF8 ob_unicode) :external-format :utf-8)
-            do (progn (write-string (string+ #\Space #\Space line)
-                                    out)
-                      (pydecref ob_unicode))
-            finally (pydecref* ob_module ob_formatter ob_tuple ob_list)))))
+            do (write-string (string+ #\Space #\Space line) out)
+            finally (with-stack-list (obs ob_module ob_formatter ob_tuple ob_list)
+                      (dolist (ob obs)
+                        (Py_DecRef ob)))))))
 
 (defun pyerror (&optional place)
   (if* python-exception-occurred
@@ -242,10 +281,11 @@ construct the \"msg\"."))
   (check-type place symbol)
   (let ((val (gensym "val")))
     `(let ((,val ,form))
-       (declare (type pyobject ,val))
-       (if* (pynull ,val)
-          then (pyerror ',place)
-          else ,val))))
+       (etypecase ,val
+         (pyobject
+          (if (pynull ,val) (pyerror ',place) ,val))
+         ((unsigned-byte #+32bit 32 #+64bit 64)
+          (if (= 0 ,val) (pyerror ',place) ,val))))))
 
 (defmacro pycheckz (form &optional (place nil place-p))
   (when (and (not place-p)

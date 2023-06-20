@@ -13,10 +13,6 @@
    #:+PY_LOCK_INTR+
    #:+PyGILState_LOCKED+
    #:+PyGILState_UNLOCKED+
-   #:pyobject
-   #:pyobject-finalization
-   #:*pynull*
-   #:make-pyobject
    ;; capi
    #:+libpython-extern-variables+
    ;; sys
@@ -41,18 +37,27 @@
    #:with-python-gil
    ;; --- pyobject
    ;; APIs and Utilities
+   #:pyobject
+   #:pyobject-type
+   #:pyobject-finalization
+   #:*pynull*
+   #:make-pyobject
+   #:pyobject-p
    #:pyobject-eq
    #:pynull
    #:pyincref
    #:pydecref
    #:pydecref*
    #:pystealref
+   #:schedule-pyobject-finalization
+   #:unschedule-pyobject-finalization
    ;; -- python exception
    #:python-exception
+   #:python-exception-place
    #:python-exception-type
    #:python-exception-msg
+   #:python-exception-context
    #:python-exception-occurred
-   #:make-python-exception
    #:pyerror
    #:pycheckn
    #:pycheckz))

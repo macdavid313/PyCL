@@ -27,10 +27,10 @@
     (list (case (first x)
             (:pointer (case (second x)
                         ;; see https://peps.python.org/pep-0384/#structures
-                        ((PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef PyModuleDef_Base PyModuleDef PyStructSequence_Field PyStructSequence_Desc PyType_Slot PyType_Spec)
-                         (if* ret
-                            then `((* ,(second x)) t foreign-python-funcall-converter/returning)
-                            else `((* ,(second x)))))
+                        ;; ((PyObject PyVarObject PyMethodDef PyMemberDef PyGetSetDef PyModuleDef_Base PyModuleDef PyStructSequence_Field PyStructSequence_Desc PyType_Slot PyType_Spec)
+                        ;;  (if* ret
+                        ;;     then `((* ,(second x)) t foreign-python-funcall-converter/returning)
+                        ;;     else `((* ,(second x)))))
                         (:char '((* :char) #+32bit (unsigned-byte 32) #+64bit (unsigned-byte 64))) ; char*
                         (size_t '((* :unsigned-nat)))
                         (int64_t '((* :long-long)))
