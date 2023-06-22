@@ -120,8 +120,7 @@
 ;;; https://docs.python.org/3/c-api/intro.html#objects-types-and-reference-counts
 ;;; -----------------------------------------------------------------------------
 (defclass pyobject (foreign-pointer)
-  ((ptype :initform nil :accessor pyobject-type :type (or symbol (unsigned-byte #+32bit 32 #+64bit 64)))
-   (finalization :accessor pyobject-finalization :type (or null excl::finalization)))
+  ((finalization :accessor pyobject-finalization :type (or null excl::finalization)))
   (:documentation "Foreign pointer type for PyObject."))
 
 (defvar-nonbindable *pynull*
@@ -129,7 +128,7 @@
                              :foreign-address 0)
   "A singleton that represents a NULL foreign pointer of PyObject")
 
-(defun make-pyobject (addr &optional (lifetime :new))
+(defun make-pyobject (addr &optional (lifetime :default))
   (declare (type (unsigned-byte #+32bit 32 #+64bit 64) addr)
            (type (member :default :new :borrowed) lifetime)
            (optimize (speed 3) (safety 0) (space 0)))
@@ -137,22 +136,10 @@
      then *pynull*
      else (let ((ob (make-instance 'pyobject :foreign-type 'PyObject
                                              :foreign-address addr)))
-            (when (member lifetime '(:default :new) :test 'eq)
-              (schedule-pyobject-finalization ob))
-            (setf (pyobject-type ob)
-                  (pyglobalptr (PyObject_Type addr)))
+            (ecase lifetime
+              ((:default :new) (schedule-pyobject-finalization ob))
+              (:borrowed nil))
             ob)))
-
-(defmethod print-object ((fp pyobject) stream)
-  (if* (= 0 (foreign-pointer-address fp))
-     then (write-sequence "#<PyObject NULL>" stream)
-     else (let ((*print-base* 16))
-            (if* (pyobject-type fp)
-               then (format stream "#<PyObject (~a) @ #x~a>"
-                                   (pyobject-type fp)
-                                   (foreign-pointer-address fp))
-               else (format stream "#<PyObject @ #x~a>"
-                                   (foreign-pointer-address fp))))))
 
 (defun pyobject-p (thing)
   (typep thing 'pyobject))
@@ -282,10 +269,10 @@ construct the \"msg\"."))
   (let ((val (gensym "val")))
     `(let ((,val ,form))
        (etypecase ,val
-         (pyobject
-          (if (pynull ,val) (pyerror ',place) ,val))
          ((unsigned-byte #+32bit 32 #+64bit 64)
-          (if (= 0 ,val) (pyerror ',place) ,val))))))
+          (if (= 0 ,val) (pyerror ',place) ,val))
+         (pyobject
+          (if (pynull ,val) (pyerror ',place) ,val))))))
 
 (defmacro pycheckz (form &optional (place nil place-p))
   (when (and (not place-p)

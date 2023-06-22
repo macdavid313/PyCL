@@ -19,6 +19,7 @@
                    "sys/sys"
                    ;; start of pycl module
                    "pycl/package"
+                   "pycl/const"
                    "pycl/init"
                    "pycl/objects"
                    ;; files list ends here

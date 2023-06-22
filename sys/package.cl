@@ -38,7 +38,6 @@
    ;; --- pyobject
    ;; APIs and Utilities
    #:pyobject
-   #:pyobject-type
    #:pyobject-finalization
    #:*pynull*
    #:make-pyobject
