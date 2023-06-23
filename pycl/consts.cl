@@ -1,5 +1,5 @@
-;;;; const.cl
-;;;; Constants and extra foreign definitions
+;;;; consts.cl
+;;;; extra constants and foreign definitions
 (in-package #:pycl)
 
 (defconstant +Py_single_input+    256)
