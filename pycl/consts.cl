@@ -21,6 +21,11 @@
 (defconstant +Py_METH_CLASS+    #x0010)
 (defconstant +Py_METH_STATIC+   #x0020)
 
+(defconstant +Py_READONLY+         1)
+(defconstant +Py_READ_RESTRICTED+  2)
+(defconstant +Py_WRITE_RESTRICTED+ 4)
+(defconstant +Py_RESTRICTED+       (logior +Py_READ_RESTRICTED+ +Py_WRITE_RESTRICTED+))
+
 (def-foreign-type PyNumberMethods
     (:struct
      (add (* :void))
