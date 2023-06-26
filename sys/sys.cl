@@ -160,10 +160,11 @@
   (when (not (pynull ob))
     (unschedule-pyobject-finalization ob)
     (Py_DecRef ob)
-    (setf (foreign-pointer-address ob) 0)))
+    (setf (foreign-pointer-address ob) 0))
+  *pynull*)
 
 (defun pydecref* (&rest obs)
-  (dolist (ob obs)
+  (dolist (ob obs *pynull*)
     (pydecref ob)))
 
 (defmethod pystealref ((ob pyobject))
@@ -178,7 +179,7 @@ This macro should always be used \"in place\" e.g. (PyList_SetItem ob_list idx (
 
 (defmethod schedule-pyobject-finalization ((ob pyobject))
   (setf (pyobject-finalization ob)
-        (schedule-finalization ob 'pydecref))
+        (schedule-finalization ob 'Py_DecRef))
   ob)
 
 (defmethod unschedule-pyobject-finalization ((ob pyobject))
